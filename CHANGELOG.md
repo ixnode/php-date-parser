@@ -7,9 +7,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Releases
 
+### [0.1.2] - 2023-07-08
+
+* Add "yesterday" to "today" to README.md and tests.
+
 ### [0.1.1] - 2023-07-08
 
 * README.md changes
+
 
 ### [0.1.0] - 2023-07-07
 
