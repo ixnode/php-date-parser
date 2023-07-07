@@ -44,7 +44,7 @@ $dateParser = (new DateParser('today'))->formatTo('Y-m-d H:i:s');
 
 ## Parsing formats / overview
 
-*  Imagine today would be the 2023-07-07
+*  Imagine today would be the `2023-07-07`
 
 | string                                  | description                                           | from                                 | to                                   |
 |-----------------------------------------|-------------------------------------------------------|--------------------------------------|--------------------------------------|
