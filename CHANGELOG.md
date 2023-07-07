@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### [0.1.0] - 2023-07-07
 
-* Initial release
+* Initial release with the first implementation
 * Add src
 * Add tests
   * PHP Coding Standards Fixer
