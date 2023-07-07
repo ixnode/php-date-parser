@@ -59,6 +59,7 @@ $dateParser = (new DateParser('today'))->formatTo('Y-m-d H:i:s');
 | <nobr>`"2023-07-01\|2023-07-03"`</nobr> | Date from `"2023-07-01"` to `"2023-07-03"`            | <nobr>`"2023-07-01 00:00:00"`</nobr> | <nobr>`"2023-07-03 23:59:59"`</nobr> |
 | <nobr>`"2023-07-01\|today"`</nobr>      | Date from `"2023-07-01"` to `"today"`                 | <nobr>`"2023-07-01 00:00:00"`</nobr> | <nobr>`"2023-07-07 23:59:59"`</nobr> |
 | <nobr>`"2023-07-01\|yesterday"`</nobr>  | Date from `"2023-07-01"` to `"yesterday"`             | <nobr>`"2023-07-01 00:00:00"`</nobr> | <nobr>`"2023-07-06 23:59:59"`</nobr> |
+| <nobr>`"yesterday\|today"`</nobr>       | Date from `"yesterday"` to `"today"`                  | <nobr>`"2023-07-06 00:00:00"`</nobr> | <nobr>`"2023-07-07 23:59:59"`</nobr> |
 
 ## Methods
 

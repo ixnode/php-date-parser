@@ -157,6 +157,12 @@ final class DateParserTest extends TestCase
              */
             [++$number, 'formatFrom', DateParser::FORMAT_DEFAULT, '2023-07-01|yesterday', '2023-07-01 00:00:00'],
             [++$number, 'formatTo', DateParser::FORMAT_DEFAULT, '2023-07-01|yesterday', $this->getYesterday(DateParser::HOUR_LAST, DateParser::MINUTE_LAST, DateParser::SECOND_LAST)->format(DateParser::FORMAT_DEFAULT)],
+
+            /**
+             * Parses a given "from" to "to" date.
+             */
+            [++$number, 'formatFrom', DateParser::FORMAT_DEFAULT, 'yesterday|today', $this->getYesterday(DateParser::HOUR_FIRST, DateParser::MINUTE_FIRST, DateParser::SECOND_FIRST)->format(DateParser::FORMAT_DEFAULT)],
+            [++$number, 'formatTo', DateParser::FORMAT_DEFAULT, 'yesterday|today', $this->getToday(DateParser::HOUR_LAST, DateParser::MINUTE_LAST, DateParser::SECOND_LAST)->format(DateParser::FORMAT_DEFAULT)],
         ];
     }
 
