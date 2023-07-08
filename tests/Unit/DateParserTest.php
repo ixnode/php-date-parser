@@ -15,6 +15,7 @@ namespace Ixnode\PhpDateParser\Tests\Unit;
 
 use DateInterval;
 use DateTime;
+use Exception;
 use Ixnode\PhpDateParser\DateParser;
 use Ixnode\PhpException\Parser\ParserException;
 use Ixnode\PhpException\Type\TypeInvalidException;
@@ -98,6 +99,8 @@ final class DateParserTest extends TestCase
      * Data provider: Parses a given date (exactly).
      *
      * @return array<int, array<int, mixed>>
+     * @throws Exception
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function dataProviderDateExactly(): array
     {
@@ -138,6 +141,54 @@ final class DateParserTest extends TestCase
              */
             $this->getConfigFrom('=yesterday', $this->getYesterday(DateParser::HOUR_FIRST, DateParser::MINUTE_FIRST, DateParser::SECOND_FIRST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
             $this->getConfigTo('=yesterday', $this->getYesterday(DateParser::HOUR_LAST, DateParser::MINUTE_LAST, DateParser::SECOND_LAST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+            /**
+             * Parses a given date (exactly): next-month.
+             */
+            $this->getConfigFrom('next-month', $this->getFirstNextMonth(DateParser::HOUR_FIRST, DateParser::MINUTE_FIRST, DateParser::SECOND_FIRST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('next-month', $this->getLastNextMonth(DateParser::HOUR_LAST, DateParser::MINUTE_LAST, DateParser::SECOND_LAST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+            /**
+             * Parses a given date (exactly): next-month.
+             */
+            $this->getConfigFrom('=next-month', $this->getFirstNextMonth(DateParser::HOUR_FIRST, DateParser::MINUTE_FIRST, DateParser::SECOND_FIRST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('=next-month', $this->getLastNextMonth(DateParser::HOUR_LAST, DateParser::MINUTE_LAST, DateParser::SECOND_LAST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+            /**
+             * Parses a given date (exactly): this-month.
+             */
+            $this->getConfigFrom('this-month', $this->getFirstThisMonth(DateParser::HOUR_FIRST, DateParser::MINUTE_FIRST, DateParser::SECOND_FIRST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('this-month', $this->getLastThisMonth(DateParser::HOUR_LAST, DateParser::MINUTE_LAST, DateParser::SECOND_LAST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+            /**
+             * Parses a given date (exactly): this-month.
+             */
+            $this->getConfigFrom('=this-month', $this->getFirstThisMonth(DateParser::HOUR_FIRST, DateParser::MINUTE_FIRST, DateParser::SECOND_FIRST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('=this-month', $this->getLastThisMonth(DateParser::HOUR_LAST, DateParser::MINUTE_LAST, DateParser::SECOND_LAST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+            /**
+             * Parses a given date (exactly): last-month.
+             */
+            $this->getConfigFrom('last-month', $this->getFirstLastMonth(DateParser::HOUR_FIRST, DateParser::MINUTE_FIRST, DateParser::SECOND_FIRST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('last-month', $this->getLastLastMonth(DateParser::HOUR_LAST, DateParser::MINUTE_LAST, DateParser::SECOND_LAST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+            /**
+             * Parses a given date (exactly): last-month.
+             */
+            $this->getConfigFrom('=last-month', $this->getFirstLastMonth(DateParser::HOUR_FIRST, DateParser::MINUTE_FIRST, DateParser::SECOND_FIRST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('=last-month', $this->getLastLastMonth(DateParser::HOUR_LAST, DateParser::MINUTE_LAST, DateParser::SECOND_LAST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+            /**
+             * Parses a given date (exactly): this-year.
+             */
+            $this->getConfigFrom('this-year', $this->getFirstThisYear(DateParser::HOUR_FIRST, DateParser::MINUTE_FIRST, DateParser::SECOND_FIRST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('this-year', $this->getLastThisYear(DateParser::HOUR_LAST, DateParser::MINUTE_LAST, DateParser::SECOND_LAST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+            /**
+             * Parses a given date (exactly): this-year.
+             */
+            $this->getConfigFrom('=this-year', $this->getFirstThisYear(DateParser::HOUR_FIRST, DateParser::MINUTE_FIRST, DateParser::SECOND_FIRST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('=this-year', $this->getLastThisYear(DateParser::HOUR_LAST, DateParser::MINUTE_LAST, DateParser::SECOND_LAST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
 
             /**
              * Parses a given date (exactly).
@@ -323,6 +374,7 @@ final class DateParserTest extends TestCase
      * Data provider: Parses a given "from" to "to" date.
      *
      * @return array<int, array<int, mixed>>
+     * @throws Exception
      */
     public function dataProviderDateFromToTo(): array
     {
@@ -356,6 +408,18 @@ final class DateParserTest extends TestCase
              */
             $this->getConfigFrom('yesterday|today', $this->getYesterday(DateParser::HOUR_FIRST, DateParser::MINUTE_FIRST, DateParser::SECOND_FIRST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
             $this->getConfigTo('yesterday|today', $this->getToday(DateParser::HOUR_LAST, DateParser::MINUTE_LAST, DateParser::SECOND_LAST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+            /**
+             * Parses a given "from" to "to" date.
+             */
+            $this->getConfigFrom('yesterday|this-month', $this->getYesterday(DateParser::HOUR_FIRST, DateParser::MINUTE_FIRST, DateParser::SECOND_FIRST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('yesterday|this-month', $this->getLastThisMonth(DateParser::HOUR_LAST, DateParser::MINUTE_LAST, DateParser::SECOND_LAST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+            /**
+             * Parses a given "from" to "to" date.
+             */
+            $this->getConfigFrom('this-month|today', $this->getFirstThisMonth(DateParser::HOUR_FIRST, DateParser::MINUTE_FIRST, DateParser::SECOND_FIRST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('this-month|today', $this->getToday(DateParser::HOUR_LAST, DateParser::MINUTE_LAST, DateParser::SECOND_LAST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
         ];
     }
 
@@ -435,5 +499,129 @@ final class DateParserTest extends TestCase
     private function getBeforeYesterday(int $hour, int $minute, int $second): DateTime
     {
         return (new DateTime())->sub(new DateInterval('P2D'))->setTime($hour, $minute, $second);
+    }
+
+    /**
+     * Returns the first day of this month with the given time.
+     *
+     * @param int $hour
+     * @param int $minute
+     * @param int $second
+     * @return DateTime
+     * @throws Exception
+     */
+    private function getFirstNextMonth(int $hour, int $minute, int $second): DateTime
+    {
+        return (new DateTime(date(DateParser::FORMAT_THIS_MONTH_LAST)))
+            ->setTime(DateParser::HOUR_LAST,DateParser::MINUTE_LAST, DateParser::SECOND_LAST)
+            ->modify('+1 second')
+            ->setTime($hour, $minute, $second);
+    }
+
+    /**
+     * Returns the first day of this month with the given time.
+     *
+     * @param int $hour
+     * @param int $minute
+     * @param int $second
+     * @return DateTime
+     * @throws Exception
+     */
+    private function getLastNextMonth(int $hour, int $minute, int $second): DateTime
+    {
+        $firstNextMonth = $this->getFirstNextMonth($hour, $minute, $second);
+
+        return (new DateTime($firstNextMonth->format(DateParser::FORMAT_THIS_MONTH_LAST)))
+            ->setTime($hour, $minute, $second);
+    }
+
+    /**
+     * Returns the first day of this month with the given time.
+     *
+     * @param int $hour
+     * @param int $minute
+     * @param int $second
+     * @return DateTime
+     * @throws Exception
+     */
+    private function getFirstThisMonth(int $hour, int $minute, int $second): DateTime
+    {
+        return (new DateTime(date(DateParser::FORMAT_THIS_MONTH_FIRST)))->setTime($hour, $minute, $second);
+    }
+
+    /**
+     * Returns the first day of this month with the given time.
+     *
+     * @param int $hour
+     * @param int $minute
+     * @param int $second
+     * @return DateTime
+     * @throws Exception
+     */
+    private function getLastThisMonth(int $hour, int $minute, int $second): DateTime
+    {
+        return (new DateTime(date(DateParser::FORMAT_THIS_MONTH_LAST)))->setTime($hour, $minute, $second);
+    }
+
+    /**
+     * Returns the first day of the last month with the given time.
+     *
+     * @param int $hour
+     * @param int $minute
+     * @param int $second
+     * @return DateTime
+     * @throws Exception
+     */
+    private function getFirstLastMonth(int $hour, int $minute, int $second): DateTime
+    {
+        $lastLastMonth = $this->getLastLastMonth($hour, $minute, $second);
+
+        return (new DateTime($lastLastMonth->format(DateParser::FORMAT_THIS_MONTH_FIRST)))
+            ->setTime($hour, $minute, $second);
+    }
+
+    /**
+     * Returns the first day of the last month with the given time.
+     *
+     * @param int $hour
+     * @param int $minute
+     * @param int $second
+     * @return DateTime
+     * @throws Exception
+     */
+    private function getLastLastMonth(int $hour, int $minute, int $second): DateTime
+    {
+        return (new DateTime(date(DateParser::FORMAT_THIS_MONTH_FIRST)))
+            ->setTime(DateParser::HOUR_FIRST, DateParser::MINUTE_FIRST, DateParser::SECOND_FIRST)
+            ->modify('-1 second')
+            ->setTime($hour, $minute, $second);
+    }
+
+    /**
+     * Returns the first day of this year with the given time.
+     *
+     * @param int $hour
+     * @param int $minute
+     * @param int $second
+     * @return DateTime
+     * @throws Exception
+     */
+    private function getFirstThisYear(int $hour, int $minute, int $second): DateTime
+    {
+        return (new DateTime(date(DateParser::FORMAT_THIS_YEAR_FIRST)))->setTime($hour, $minute, $second);
+    }
+
+    /**
+     * Returns the first day of this year with the given time.
+     *
+     * @param int $hour
+     * @param int $minute
+     * @param int $second
+     * @return DateTime
+     * @throws Exception
+     */
+    private function getLastThisYear(int $hour, int $minute, int $second): DateTime
+    {
+        return (new DateTime(date(DateParser::FORMAT_THIS_YEAR_LAST)))->setTime($hour, $minute, $second);
     }
 }

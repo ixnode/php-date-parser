@@ -15,6 +15,7 @@ namespace Ixnode\PhpDateParser;
 
 use DateTime;
 use DateTimeImmutable;
+use Exception;
 use Ixnode\PhpDateParser\Tests\Unit\DateParserTest;
 use Ixnode\PhpException\Parser\ParserException;
 use Ixnode\PhpException\Type\TypeInvalidException;
@@ -45,11 +46,31 @@ class DateParser
 
     final public const FORMAT_DATE = 'Y-m-d';
 
+    final public const FORMAT_THIS_MONTH_FIRST = 'Y-m-1';
+
+    final public const FORMAT_THIS_MONTH_LAST = 'Y-m-t';
+
+    final public const FORMAT_THIS_YEAR_FIRST = 'Y-1-1';
+
+    final public const FORMAT_THIS_YEAR_LAST = 'Y-12-31';
+
     final public const VALUE_TOMORROW = 'tomorrow';
 
     final public const VALUE_TODAY = 'today';
 
     final public const VALUE_YESTERDAY = 'yesterday';
+
+    final public const VALUE_NEXT_MONTH = 'next-month';
+
+    final public const VALUE_THIS_MONTH = 'this-month';
+
+    final public const VALUE_LAST_MONTH = 'last-month';
+
+    final public const VALUE_NEXT_YEAR = 'next-year';
+
+    final public const VALUE_THIS_YEAR = 'this-year';
+
+    final public const VALUE_LAST_YEAR = 'last-year';
 
     final public const SECONDS_A_DAY = 86400;
 
@@ -76,7 +97,9 @@ class DateParser
      * @return DateRange
      * @throws TypeInvalidException
      * @throws ParserException
+     * @throws Exception
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     private function parseRange(string|null $range): DateRange
     {
@@ -97,20 +120,46 @@ class DateParser
                     (new DateTime(self::VALUE_TOMORROW))->setTime(self::HOUR_FIRST, self::MINUTE_FIRST, self::SECOND_FIRST),
                     (new DateTime(self::VALUE_TOMORROW))->setTime(self::HOUR_LAST, self::MINUTE_LAST, self::SECOND_LAST)
                 );
-
             /* Parses "today" date. */
             case $range === self::VALUE_TODAY:
                 return new DateRange(
                     (new DateTime())->setTime(self::HOUR_FIRST, self::MINUTE_FIRST, self::SECOND_FIRST),
                     (new DateTime())->setTime(self::HOUR_LAST, self::MINUTE_LAST, self::SECOND_LAST)
                 );
-
-
             /* Parses "yesterday" date. */
             case $range === self::VALUE_YESTERDAY:
                 return new DateRange(
                     (new DateTime(self::VALUE_YESTERDAY))->setTime(self::HOUR_FIRST, self::MINUTE_FIRST, self::SECOND_FIRST),
                     (new DateTime(self::VALUE_YESTERDAY))->setTime(self::HOUR_LAST, self::MINUTE_LAST, self::SECOND_LAST)
+                );
+            /* Parses "next-month" date. */
+            case $range === self::VALUE_NEXT_MONTH:
+                $firstNextMonth = (new DateTime(date(self::FORMAT_THIS_MONTH_LAST)))
+                    ->setTime(self::HOUR_LAST, self::MINUTE_LAST, self::SECOND_LAST)
+                    ->modify('+1 second');
+                $lastNextMonth = (new DateTime($firstNextMonth->format(self::FORMAT_THIS_MONTH_LAST)))
+                    ->setTime(self::HOUR_LAST, self::MINUTE_LAST, self::SECOND_LAST);
+                return new DateRange($firstNextMonth, $lastNextMonth);
+            /* Parses "this-month" date. */
+            case $range === self::VALUE_THIS_MONTH:
+                return new DateRange(
+                    (new DateTime(date(self::FORMAT_THIS_MONTH_FIRST)))->setTime(self::HOUR_FIRST, self::MINUTE_FIRST, self::SECOND_FIRST),
+                    (new DateTime(date(self::FORMAT_THIS_MONTH_LAST)))->setTime(self::HOUR_LAST, self::MINUTE_LAST, self::SECOND_LAST)
+                );
+            /* Parses "last-month" date. */
+            case $range === self::VALUE_LAST_MONTH:
+                $lastLastMonth = (new DateTime(date(self::FORMAT_THIS_MONTH_FIRST)))
+                    ->setTime(self::HOUR_FIRST, self::MINUTE_FIRST, self::SECOND_FIRST)
+                    ->modify('-1 second')
+                    ->setTime(self::HOUR_LAST, self::MINUTE_LAST, self::SECOND_LAST);
+                $firstLastMonth = (new DateTime($lastLastMonth->format(self::FORMAT_THIS_MONTH_FIRST)))
+                    ->setTime(self::HOUR_FIRST, self::MINUTE_FIRST, self::SECOND_FIRST);
+                return new DateRange($firstLastMonth, $lastLastMonth);
+            /* Parses "this-year" date. */
+            case $range === self::VALUE_THIS_YEAR:
+                return new DateRange(
+                    (new DateTime(date(self::FORMAT_THIS_YEAR_FIRST)))->setTime(self::HOUR_FIRST, self::MINUTE_FIRST, self::SECOND_FIRST),
+                    (new DateTime(date(self::FORMAT_THIS_YEAR_LAST)))->setTime(self::HOUR_LAST, self::MINUTE_LAST, self::SECOND_LAST)
                 );
 
 
