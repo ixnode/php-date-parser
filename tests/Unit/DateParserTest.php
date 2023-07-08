@@ -179,6 +179,18 @@ final class DateParserTest extends TestCase
             $this->getConfigTo('=last-month', $this->getLastLastMonth(DateParser::HOUR_LAST, DateParser::MINUTE_LAST, DateParser::SECOND_LAST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
 
             /**
+             * Parses a given date (exactly): next-year.
+             */
+            $this->getConfigFrom('next-year', $this->getFirstNextYear(DateParser::HOUR_FIRST, DateParser::MINUTE_FIRST, DateParser::SECOND_FIRST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('next-year', $this->getLastNextYear(DateParser::HOUR_LAST, DateParser::MINUTE_LAST, DateParser::SECOND_LAST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+            /**
+             * Parses a given date (exactly): next-year.
+             */
+            $this->getConfigFrom('=next-year', $this->getFirstNextYear(DateParser::HOUR_FIRST, DateParser::MINUTE_FIRST, DateParser::SECOND_FIRST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('=next-year', $this->getLastNextYear(DateParser::HOUR_LAST, DateParser::MINUTE_LAST, DateParser::SECOND_LAST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+            /**
              * Parses a given date (exactly): this-year.
              */
             $this->getConfigFrom('this-year', $this->getFirstThisYear(DateParser::HOUR_FIRST, DateParser::MINUTE_FIRST, DateParser::SECOND_FIRST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
@@ -189,6 +201,18 @@ final class DateParserTest extends TestCase
              */
             $this->getConfigFrom('=this-year', $this->getFirstThisYear(DateParser::HOUR_FIRST, DateParser::MINUTE_FIRST, DateParser::SECOND_FIRST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
             $this->getConfigTo('=this-year', $this->getLastThisYear(DateParser::HOUR_LAST, DateParser::MINUTE_LAST, DateParser::SECOND_LAST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+            /**
+             * Parses a given date (exactly): last-year.
+             */
+            $this->getConfigFrom('last-year', $this->getFirstLastYear(DateParser::HOUR_FIRST, DateParser::MINUTE_FIRST, DateParser::SECOND_FIRST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('last-year', $this->getLastLastYear(DateParser::HOUR_LAST, DateParser::MINUTE_LAST, DateParser::SECOND_LAST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+            /**
+             * Parses a given date (exactly): last-year.
+             */
+            $this->getConfigFrom('=last-year', $this->getFirstLastYear(DateParser::HOUR_FIRST, DateParser::MINUTE_FIRST, DateParser::SECOND_FIRST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('=last-year', $this->getLastLastYear(DateParser::HOUR_LAST, DateParser::MINUTE_LAST, DateParser::SECOND_LAST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
 
             /**
              * Parses a given date (exactly).
@@ -598,6 +622,40 @@ final class DateParserTest extends TestCase
     }
 
     /**
+     * Returns the first day of the next year with the given time.
+     *
+     * @param int $hour
+     * @param int $minute
+     * @param int $second
+     * @return DateTime
+     * @throws Exception
+     */
+    private function getFirstNextYear(int $hour, int $minute, int $second): DateTime
+    {
+        return (new DateTime(date(DateParser::FORMAT_THIS_YEAR_LAST)))
+            ->setTime(DateParser::HOUR_LAST,DateParser::MINUTE_LAST, DateParser::SECOND_LAST)
+            ->modify('+1 second')
+            ->setTime($hour, $minute, $second);
+    }
+
+    /**
+     * Returns the last day of the next year with the given time.
+     *
+     * @param int $hour
+     * @param int $minute
+     * @param int $second
+     * @return DateTime
+     * @throws Exception
+     */
+    private function getLastNextYear(int $hour, int $minute, int $second): DateTime
+    {
+        $firstNextYear = $this->getFirstNextYear($hour, $minute, $second);
+
+        return (new DateTime($firstNextYear->format(DateParser::FORMAT_THIS_YEAR_LAST)))
+            ->setTime($hour, $minute, $second);
+    }
+
+    /**
      * Returns the first day of this year with the given time.
      *
      * @param int $hour
@@ -623,5 +681,39 @@ final class DateParserTest extends TestCase
     private function getLastThisYear(int $hour, int $minute, int $second): DateTime
     {
         return (new DateTime(date(DateParser::FORMAT_THIS_YEAR_LAST)))->setTime($hour, $minute, $second);
+    }
+
+    /**
+     * Returns the first day of the last year with the given time.
+     *
+     * @param int $hour
+     * @param int $minute
+     * @param int $second
+     * @return DateTime
+     * @throws Exception
+     */
+    private function getFirstLastYear(int $hour, int $minute, int $second): DateTime
+    {
+        $lastLastYear = $this->getLastLastYear($hour, $minute, $second);
+
+        return (new DateTime($lastLastYear->format(DateParser::FORMAT_THIS_YEAR_FIRST)))
+            ->setTime($hour, $minute, $second);
+    }
+
+    /**
+     * Returns the last day of the last year with the given time.
+     *
+     * @param int $hour
+     * @param int $minute
+     * @param int $second
+     * @return DateTime
+     * @throws Exception
+     */
+    private function getLastLastYear(int $hour, int $minute, int $second): DateTime
+    {
+        return (new DateTime(date(DateParser::FORMAT_THIS_YEAR_FIRST)))
+            ->setTime(DateParser::HOUR_FIRST, DateParser::MINUTE_FIRST, DateParser::SECOND_FIRST)
+            ->modify('-1 second')
+            ->setTime($hour, $minute, $second);
     }
 }
