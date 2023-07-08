@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Releases
 
+### [0.1.4] - 2023-07-08
+
+* Add more parser options like next-month, this-month, last-month, this-year, etc.
+* README.md updates
+
 ### [0.1.3] - 2023-07-08
 
 * Add more parser options like tomorrow, etc.
