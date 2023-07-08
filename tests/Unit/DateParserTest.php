@@ -13,8 +13,10 @@ declare(strict_types=1);
 
 namespace Ixnode\PhpDateParser\Tests\Unit;
 
+use DateInterval;
 use DateTime;
 use Ixnode\PhpDateParser\DateParser;
+use Ixnode\PhpException\Parser\ParserException;
 use Ixnode\PhpException\Type\TypeInvalidException;
 use PHPUnit\Framework\TestCase;
 
@@ -28,25 +30,34 @@ use PHPUnit\Framework\TestCase;
  */
 final class DateParserTest extends TestCase
 {
+    private int $number = 0;
+
     /**
      * Test wrapper.
      *
-     * @dataProvider dataProvider
+     * @dataProvider dataProviderNone
+     * @dataProvider dataProviderDateExactly
+     * @dataProvider dataProviderDateToInfinity
+     * @dataProvider dataProviderInfinityToDate
+     * @dataProvider dataProviderDateFromToTo
      *
      * @test
-     * @testdox $number) Test Country: $method
+     * @testdox $dataProvider/$number) Test DateParser("$given")::$method() === "$expected";
+     * @param string $dataProvider
      * @param int $number
      * @param string $method
      * @param string|null $parameter
-     * @param string $given
+     * @param string|null $given
      * @param string|null $expected
+     * @throws ParserException
      * @throws TypeInvalidException
      */
     public function wrapper(
+        string $dataProvider,
         int $number,
         string $method,
         string|null $parameter,
-        string $given,
+        string|null $given,
         string|null $expected
     ): void
     {
@@ -58,6 +69,7 @@ final class DateParserTest extends TestCase
 
         /* Assert */
         $this->assertIsNumeric($number); // To avoid phpmd warning.
+        $this->assertIsString($dataProvider); // To avoid phpmd warning.
         $this->assertContains($method, get_class_methods(DateParser::class));
         $this->assertIsCallable($callback);
 
@@ -70,100 +82,320 @@ final class DateParserTest extends TestCase
     }
 
     /**
-     * Data provider.
+     * Data provider: Parses none.
      *
-     * @return array<int, array<int, string|int|null>>
+     * @return array<int, array<int, mixed>>
      */
-    public function dataProvider(): array
+    public function dataProviderNone(): array
     {
-        $number = 0;
+        return [
+            $this->getConfigFrom(null, null, __FUNCTION__),
+            $this->getConfigTo(null, null, __FUNCTION__),
+        ];
+    }
 
+    /**
+     * Data provider: Parses a given date (exactly).
+     *
+     * @return array<int, array<int, mixed>>
+     */
+    public function dataProviderDateExactly(): array
+    {
         return [
 
             /**
-             * Parses "today" date.
+             * Parses a given date (exactly): tomorrow.
              */
-            [
-                ++$number, 'formatFrom', DateParser::FORMAT_DEFAULT, DateParser::VALUE_TODAY,
-                $this->getToday(DateParser::HOUR_FIRST, DateParser::MINUTE_FIRST, DateParser::SECOND_FIRST)->format(DateParser::FORMAT_DEFAULT)
-            ],
-            [
-                ++$number, 'formatTo', DateParser::FORMAT_DEFAULT, DateParser::VALUE_TODAY,
-                $this->getToday(DateParser::HOUR_LAST, DateParser::MINUTE_LAST, DateParser::SECOND_LAST)->format(DateParser::FORMAT_DEFAULT)
-            ],
+            $this->getConfigFrom('tomorrow', $this->getTomorrow(DateParser::HOUR_FIRST, DateParser::MINUTE_FIRST, DateParser::SECOND_FIRST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('tomorrow', $this->getTomorrow(DateParser::HOUR_LAST, DateParser::MINUTE_LAST, DateParser::SECOND_LAST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
 
             /**
-             * Parses "yesterday" date.
+             * Parses a given date (exactly): tomorrow.
              */
-            [
-                ++$number, 'formatFrom', DateParser::FORMAT_DEFAULT, DateParser::VALUE_YESTERDAY,
-                $this->getYesterday(DateParser::HOUR_FIRST, DateParser::MINUTE_FIRST, DateParser::SECOND_FIRST)->format(DateParser::FORMAT_DEFAULT)
-            ],
-            [
-                ++$number, 'formatTo', DateParser::FORMAT_DEFAULT, DateParser::VALUE_YESTERDAY,
-                $this->getYesterday(DateParser::HOUR_LAST, DateParser::MINUTE_LAST, DateParser::SECOND_LAST)->format(DateParser::FORMAT_DEFAULT)
-            ],
+            $this->getConfigFrom('=tomorrow', $this->getTomorrow(DateParser::HOUR_FIRST, DateParser::MINUTE_FIRST, DateParser::SECOND_FIRST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('=tomorrow', $this->getTomorrow(DateParser::HOUR_LAST, DateParser::MINUTE_LAST, DateParser::SECOND_LAST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
 
             /**
-             * Parses a "∞ (infinity)" to given "from" date (excluding given date).
+             * Parses a given date (exactly): today.
              */
-            [++$number, 'formatFrom', DateParser::FORMAT_DEFAULT, '<2023-07-01', null],
-            [++$number, 'formatTo', DateParser::FORMAT_DEFAULT, '<2023-07-01', '2023-06-30 23:59:59'],
+            $this->getConfigFrom('today', $this->getToday(DateParser::HOUR_FIRST, DateParser::MINUTE_FIRST, DateParser::SECOND_FIRST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('today', $this->getToday(DateParser::HOUR_LAST, DateParser::MINUTE_LAST, DateParser::SECOND_LAST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
 
             /**
-             * Parses a "∞ (infinity)" to given "from" date (including given date).
+             * Parses a given date (exactly): today.
              */
-            [++$number, 'formatFrom', DateParser::FORMAT_DEFAULT, '<+2023-07-01', null],
-            [++$number, 'formatTo', DateParser::FORMAT_DEFAULT, '<+2023-07-01', '2023-07-01 23:59:59'],
+            $this->getConfigFrom('=today', $this->getToday(DateParser::HOUR_FIRST, DateParser::MINUTE_FIRST, DateParser::SECOND_FIRST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('=today', $this->getToday(DateParser::HOUR_LAST, DateParser::MINUTE_LAST, DateParser::SECOND_LAST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
 
             /**
-             * Parses a given "from" (excluding given date) to "∞ (infinity)" date.
+             * Parses a given date (exactly): yesterday.
              */
-            [++$number, 'formatFrom', DateParser::FORMAT_DEFAULT, '>2023-07-01', '2023-07-02 00:00:00'],
-            [++$number, 'formatTo', DateParser::FORMAT_DEFAULT, '>2023-07-01', null],
+            $this->getConfigFrom('yesterday', $this->getYesterday(DateParser::HOUR_FIRST, DateParser::MINUTE_FIRST, DateParser::SECOND_FIRST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('yesterday', $this->getYesterday(DateParser::HOUR_LAST, DateParser::MINUTE_LAST, DateParser::SECOND_LAST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
 
             /**
-             * Parses a given "from" (excluding given date) to "∞ (infinity)" date.
+             * Parses a given date (exactly): yesterday.
              */
-            [++$number, 'formatFrom', DateParser::FORMAT_DEFAULT, '>+2023-07-01', '2023-07-01 00:00:00'],
-            [++$number, 'formatTo', DateParser::FORMAT_DEFAULT, '>+2023-07-01', null],
-
-            /**
-             * Parses a given "from" (excluding given date) to "∞ (infinity)" date.
-             */
-            [++$number, 'formatFrom', DateParser::FORMAT_DEFAULT, '+2023-07-01', '2023-07-01 00:00:00'],
-            [++$number, 'formatTo', DateParser::FORMAT_DEFAULT, '+2023-07-01', null],
+            $this->getConfigFrom('=yesterday', $this->getYesterday(DateParser::HOUR_FIRST, DateParser::MINUTE_FIRST, DateParser::SECOND_FIRST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('=yesterday', $this->getYesterday(DateParser::HOUR_LAST, DateParser::MINUTE_LAST, DateParser::SECOND_LAST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
 
             /**
              * Parses a given date (exactly).
              */
-            [++$number, 'formatFrom', DateParser::FORMAT_DEFAULT, '2023-07-01', '2023-07-01 00:00:00'],
-            [++$number, 'formatTo', DateParser::FORMAT_DEFAULT, '2023-07-01', '2023-07-01 23:59:59'],
+            $this->getConfigFrom('2023-07-01', '2023-07-01 00:00:00', __FUNCTION__),
+            $this->getConfigTo('2023-07-01', '2023-07-01 23:59:59', __FUNCTION__),
 
             /**
-             * Parses a given "from" to "to" date.
+             * Parses a given date (exactly).
              */
-            [++$number, 'formatFrom', DateParser::FORMAT_DEFAULT, '2023-07-01|2023-07-03', '2023-07-01 00:00:00'],
-            [++$number, 'formatTo', DateParser::FORMAT_DEFAULT, '2023-07-01|2023-07-03', '2023-07-03 23:59:59'],
-
-            /**
-             * Parses a given "from" to "to" date.
-             */
-            [++$number, 'formatFrom', DateParser::FORMAT_DEFAULT, '2023-07-01|today', '2023-07-01 00:00:00'],
-            [++$number, 'formatTo', DateParser::FORMAT_DEFAULT, '2023-07-01|today', $this->getToday(DateParser::HOUR_LAST, DateParser::MINUTE_LAST, DateParser::SECOND_LAST)->format(DateParser::FORMAT_DEFAULT)],
-
-            /**
-             * Parses a given "from" to "to" date.
-             */
-            [++$number, 'formatFrom', DateParser::FORMAT_DEFAULT, '2023-07-01|yesterday', '2023-07-01 00:00:00'],
-            [++$number, 'formatTo', DateParser::FORMAT_DEFAULT, '2023-07-01|yesterday', $this->getYesterday(DateParser::HOUR_LAST, DateParser::MINUTE_LAST, DateParser::SECOND_LAST)->format(DateParser::FORMAT_DEFAULT)],
-
-            /**
-             * Parses a given "from" to "to" date.
-             */
-            [++$number, 'formatFrom', DateParser::FORMAT_DEFAULT, 'yesterday|today', $this->getYesterday(DateParser::HOUR_FIRST, DateParser::MINUTE_FIRST, DateParser::SECOND_FIRST)->format(DateParser::FORMAT_DEFAULT)],
-            [++$number, 'formatTo', DateParser::FORMAT_DEFAULT, 'yesterday|today', $this->getToday(DateParser::HOUR_LAST, DateParser::MINUTE_LAST, DateParser::SECOND_LAST)->format(DateParser::FORMAT_DEFAULT)],
+            $this->getConfigFrom('=2023-07-01', '2023-07-01 00:00:00', __FUNCTION__),
+            $this->getConfigTo('=2023-07-01', '2023-07-01 23:59:59', __FUNCTION__),
         ];
+    }
+
+    /**
+     * Data provider: Parses a given "from" to "∞ (infinity)" date.
+     *
+     * @return array<int, array<int, mixed>>
+     */
+    public function dataProviderDateToInfinity(): array
+    {
+        return [
+
+            /**
+             * Parses a given "from" (excluding given date) to "∞ (infinity)" date.
+             */
+            $this->getConfigFrom('>today', $this->getTomorrow(DateParser::HOUR_FIRST, DateParser::MINUTE_FIRST, DateParser::SECOND_FIRST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('>today', null, __FUNCTION__),
+
+            /**
+             * Parses a given "from" (excluding given date) to "∞ (infinity)" date.
+             */
+            $this->getConfigFrom('>=today', $this->getToday(DateParser::HOUR_FIRST, DateParser::MINUTE_FIRST, DateParser::SECOND_FIRST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('>=today', null, __FUNCTION__),
+
+            /**
+             * Parses a given "from" (excluding given date) to "∞ (infinity)" date.
+             */
+            $this->getConfigFrom('>+today', $this->getToday(DateParser::HOUR_FIRST, DateParser::MINUTE_FIRST, DateParser::SECOND_FIRST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('>+today', null, __FUNCTION__),
+
+            /**
+             * Parses a given "from" (excluding given date) to "∞ (infinity)" date.
+             */
+            $this->getConfigFrom('+today', $this->getToday(DateParser::HOUR_FIRST, DateParser::MINUTE_FIRST, DateParser::SECOND_FIRST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('+today', null, __FUNCTION__),
+
+            /**
+             * Parses a given "from" (excluding given date) to "∞ (infinity)" date.
+             */
+            $this->getConfigFrom('>yesterday', $this->getToday(DateParser::HOUR_FIRST, DateParser::MINUTE_FIRST, DateParser::SECOND_FIRST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('>yesterday', null, __FUNCTION__),
+
+            /**
+             * Parses a given "from" (excluding given date) to "∞ (infinity)" date.
+             */
+            $this->getConfigFrom('>=yesterday', $this->getYesterday(DateParser::HOUR_FIRST, DateParser::MINUTE_FIRST, DateParser::SECOND_FIRST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('>=yesterday', null, __FUNCTION__),
+
+            /**
+             * Parses a given "from" (excluding given date) to "∞ (infinity)" date.
+             */
+            $this->getConfigFrom('>+yesterday', $this->getYesterday(DateParser::HOUR_FIRST, DateParser::MINUTE_FIRST, DateParser::SECOND_FIRST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('>+yesterday', null, __FUNCTION__),
+
+            /**
+             * Parses a given "from" (excluding given date) to "∞ (infinity)" date.
+             */
+            $this->getConfigFrom('+yesterday', $this->getYesterday(DateParser::HOUR_FIRST, DateParser::MINUTE_FIRST, DateParser::SECOND_FIRST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('+yesterday', null, __FUNCTION__),
+
+            /**
+             * Parses a given "from" (excluding given date) to "∞ (infinity)" date.
+             */
+            $this->getConfigFrom('>2023-07-01', '2023-07-02 00:00:00', __FUNCTION__),
+            $this->getConfigTo('>2023-07-01', null, __FUNCTION__),
+
+            /**
+             * Parses a given "from" (including given date) to "∞ (infinity)" date.
+             */
+            $this->getConfigFrom('>=2023-07-01', '2023-07-01 00:00:00', __FUNCTION__),
+            $this->getConfigTo('>=2023-07-01', null, __FUNCTION__),
+
+            /**
+             * Parses a given "from" (including given date) to "∞ (infinity)" date.
+             */
+            $this->getConfigFrom('>+2023-07-01', '2023-07-01 00:00:00', __FUNCTION__),
+            $this->getConfigTo('>+2023-07-01', null, __FUNCTION__),
+
+            /**
+             * Parses a given "from" (including given date) to "∞ (infinity)" date.
+             */
+            $this->getConfigFrom('+2023-07-01', '2023-07-01 00:00:00', __FUNCTION__),
+            $this->getConfigTo('+2023-07-01', null, __FUNCTION__),
+        ];
+    }
+
+    /**
+     * Data provider: Parses a "∞ (infinity)" to given "from" date.
+     *
+     * @return array<int, array<int, mixed>>
+     */
+    public function dataProviderInfinityToDate(): array
+    {
+        return [
+
+            /**
+             * Parses a "∞ (infinity)" to given "from" date (excluding given date).
+             */
+            $this->getConfigFrom('<today', null, __FUNCTION__),
+            $this->getConfigTo('<today', $this->getYesterday(DateParser::HOUR_LAST, DateParser::MINUTE_LAST, DateParser::SECOND_LAST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+            /**
+             * Parses a "∞ (infinity)" to given "from" date (excluding given date).
+             */
+            $this->getConfigFrom('<=today', null, __FUNCTION__),
+            $this->getConfigTo('<=today', $this->getToday(DateParser::HOUR_LAST, DateParser::MINUTE_LAST, DateParser::SECOND_LAST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+            /**
+             * Parses a "∞ (infinity)" to given "from" date (excluding given date).
+             */
+            $this->getConfigFrom('<+today', null, __FUNCTION__),
+            $this->getConfigTo('<+today', $this->getToday(DateParser::HOUR_LAST, DateParser::MINUTE_LAST, DateParser::SECOND_LAST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+            /**
+             * Parses a "∞ (infinity)" to given "from" date (excluding given date).
+             */
+            $this->getConfigFrom('-today', null, __FUNCTION__),
+            $this->getConfigTo('-today', $this->getToday(DateParser::HOUR_LAST, DateParser::MINUTE_LAST, DateParser::SECOND_LAST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+            /**
+             * Parses a "∞ (infinity)" to given "from" date (excluding given date).
+             */
+            $this->getConfigFrom('<yesterday', null, __FUNCTION__),
+            $this->getConfigTo('<yesterday', $this->getBeforeYesterday(DateParser::HOUR_LAST, DateParser::MINUTE_LAST, DateParser::SECOND_LAST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+            /**
+             * Parses a "∞ (infinity)" to given "from" date (excluding given date).
+             */
+            $this->getConfigFrom('<=yesterday', null, __FUNCTION__),
+            $this->getConfigTo('<=yesterday', $this->getYesterday(DateParser::HOUR_LAST, DateParser::MINUTE_LAST, DateParser::SECOND_LAST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+            /**
+             * Parses a "∞ (infinity)" to given "from" date (excluding given date).
+             */
+            $this->getConfigFrom('<+yesterday', null, __FUNCTION__),
+            $this->getConfigTo('<+yesterday', $this->getYesterday(DateParser::HOUR_LAST, DateParser::MINUTE_LAST, DateParser::SECOND_LAST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+            /**
+             * Parses a "∞ (infinity)" to given "from" date (excluding given date).
+             */
+            $this->getConfigFrom('-yesterday', null, __FUNCTION__),
+            $this->getConfigTo('-yesterday', $this->getYesterday(DateParser::HOUR_LAST, DateParser::MINUTE_LAST, DateParser::SECOND_LAST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+            /**
+             * Parses a "∞ (infinity)" to given "from" date (excluding given date).
+             */
+            $this->getConfigFrom('<2023-07-01', null, __FUNCTION__),
+            $this->getConfigTo('<2023-07-01', '2023-06-30 23:59:59', __FUNCTION__),
+
+            /**
+             * Parses a "∞ (infinity)" to given "from" date (excluding given date).
+             */
+            $this->getConfigFrom('<=2023-07-01', null, __FUNCTION__),
+            $this->getConfigTo('<=2023-07-01', '2023-07-01 23:59:59', __FUNCTION__),
+
+            /**
+             * Parses a "∞ (infinity)" to given "from" date (including given date).
+             */
+            $this->getConfigFrom('<+2023-07-01', null, __FUNCTION__),
+            $this->getConfigTo('<+2023-07-01', '2023-07-01 23:59:59', __FUNCTION__),
+
+            /**
+             * Parses a "∞ (infinity)" to given "from" date (including given date).
+             */
+            $this->getConfigFrom('-2023-07-01', null, __FUNCTION__),
+            [__FUNCTION__, ++$this->number, 'formatTo', DateParser::FORMAT_DEFAULT, '-2023-07-01', '2023-07-01 23:59:59'],
+        ];
+    }
+
+    /**
+     * Data provider: Parses a given "from" to "to" date.
+     *
+     * @return array<int, array<int, mixed>>
+     */
+    public function dataProviderDateFromToTo(): array
+    {
+        return [
+            /**
+             * Parses a given "from" to "to" date.
+             */
+            $this->getConfigFrom('2023-07-01|2023-07-03', '2023-07-01 00:00:00', __FUNCTION__),
+            $this->getConfigTo('2023-07-01|2023-07-03', '2023-07-03 23:59:59', __FUNCTION__),
+
+            /**
+             * Parses a given "from" to "to" date.
+             */
+            $this->getConfigFrom('2023-07-01|tomorrow', '2023-07-01 00:00:00', __FUNCTION__),
+            $this->getConfigTo('2023-07-01|tomorrow', $this->getTomorrow(DateParser::HOUR_LAST, DateParser::MINUTE_LAST, DateParser::SECOND_LAST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+            /**
+             * Parses a given "from" to "to" date.
+             */
+            $this->getConfigFrom('2023-07-01|today', '2023-07-01 00:00:00', __FUNCTION__),
+            $this->getConfigTo('2023-07-01|today', $this->getToday(DateParser::HOUR_LAST, DateParser::MINUTE_LAST, DateParser::SECOND_LAST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+            /**
+             * Parses a given "from" to "to" date.
+             */
+            $this->getConfigFrom('2023-07-01|yesterday', '2023-07-01 00:00:00', __FUNCTION__),
+            $this->getConfigTo('2023-07-01|yesterday', $this->getYesterday(DateParser::HOUR_LAST, DateParser::MINUTE_LAST, DateParser::SECOND_LAST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+            /**
+             * Parses a given "from" to "to" date.
+             */
+            $this->getConfigFrom('yesterday|today', $this->getYesterday(DateParser::HOUR_FIRST, DateParser::MINUTE_FIRST, DateParser::SECOND_FIRST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('yesterday|today', $this->getToday(DateParser::HOUR_LAST, DateParser::MINUTE_LAST, DateParser::SECOND_LAST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
+        ];
+    }
+
+    /**
+     * Returns the config for "from" range.
+     *
+     * @param string|null $range
+     * @param string|null $expected
+     * @param string $method
+     * @return array<int, mixed>
+     */
+    private function getConfigFrom(string|null $range, string|null $expected, string $method): array
+    {
+        return [$method, ++$this->number, 'formatFrom', DateParser::FORMAT_DEFAULT, $range, $expected];
+    }
+
+    /**
+     * Returns the config for "to" range.
+     *
+     * @param string|null $range
+     * @param string|null $expected
+     * @param string $method
+     * @return array<int, mixed>
+     */
+    private function getConfigTo(string|null $range, string|null $expected, string $method): array
+    {
+        return [$method, ++$this->number, 'formatTo', DateParser::FORMAT_DEFAULT, $range, $expected];
+    }
+
+    /**
+     * Returns the tomorrow date with the given time.
+     *
+     * @param int $hour
+     * @param int $minute
+     * @param int $second
+     * @return DateTime
+     */
+    private function getTomorrow(int $hour, int $minute, int $second): DateTime
+    {
+        return (new DateTime(DateParser::VALUE_TOMORROW))->setTime($hour, $minute, $second);
     }
 
     /**
@@ -180,7 +412,7 @@ final class DateParserTest extends TestCase
     }
 
     /**
-     * Returns the today date with the given time.
+     * Returns the yesterday date with the given time.
      *
      * @param int $hour
      * @param int $minute
@@ -190,5 +422,18 @@ final class DateParserTest extends TestCase
     private function getYesterday(int $hour, int $minute, int $second): DateTime
     {
         return (new DateTime(DateParser::VALUE_YESTERDAY))->setTime($hour, $minute, $second);
+    }
+
+    /**
+     * Returns the before yesterday date with the given time.
+     *
+     * @param int $hour
+     * @param int $minute
+     * @param int $second
+     * @return DateTime
+     */
+    private function getBeforeYesterday(int $hour, int $minute, int $second): DateTime
+    {
+        return (new DateTime())->sub(new DateInterval('P2D'))->setTime($hour, $minute, $second);
     }
 }

@@ -16,6 +16,7 @@ namespace Ixnode\PhpDateParser;
 use DateTime;
 use DateTimeImmutable;
 use Ixnode\PhpDateParser\Tests\Unit\DateParserTest;
+use Ixnode\PhpException\Parser\ParserException;
 use Ixnode\PhpException\Type\TypeInvalidException;
 
 /**
@@ -44,41 +45,66 @@ class DateParser
 
     final public const FORMAT_DATE = 'Y-m-d';
 
+    final public const VALUE_TOMORROW = 'tomorrow';
+
     final public const VALUE_TODAY = 'today';
 
     final public const VALUE_YESTERDAY = 'yesterday';
 
     final public const SECONDS_A_DAY = 86400;
 
+    protected string|null $range;
+
     private DateRange $dateRange;
 
     /**
-     * @param string $range
+     * @param string|null $range
      * @throws TypeInvalidException
+     * @throws ParserException
      */
-    public function __construct(protected string $range)
+    public function __construct(string|null $range)
     {
+        $this->range = !is_null($range) ? trim(strtolower($range)) : null;
+
         $this->dateRange = $this->parseRange($range);
     }
 
     /**
      * Parses the given date range.
      *
-     * @param string $range
+     * @param string|null $range
      * @return DateRange
      * @throws TypeInvalidException
+     * @throws ParserException
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    private function parseRange(string $range): DateRange
+    private function parseRange(string|null $range): DateRange
     {
-        $range = trim(strtolower($range));
+        if (is_null($range)) {
+            return new DateRange(
+                null,
+                null
+            );
+        }
+
+        $matches = [];
 
         switch (true) {
+
+            /* Parses "tomorrow" date. */
+            case $range === self::VALUE_TOMORROW:
+                return new DateRange(
+                    (new DateTime(self::VALUE_TOMORROW))->setTime(self::HOUR_FIRST, self::MINUTE_FIRST, self::SECOND_FIRST),
+                    (new DateTime(self::VALUE_TOMORROW))->setTime(self::HOUR_LAST, self::MINUTE_LAST, self::SECOND_LAST)
+                );
+
             /* Parses "today" date. */
             case $range === self::VALUE_TODAY:
                 return new DateRange(
                     (new DateTime())->setTime(self::HOUR_FIRST, self::MINUTE_FIRST, self::SECOND_FIRST),
                     (new DateTime())->setTime(self::HOUR_LAST, self::MINUTE_LAST, self::SECOND_LAST)
                 );
+
 
             /* Parses "yesterday" date. */
             case $range === self::VALUE_YESTERDAY:
@@ -87,13 +113,13 @@ class DateParser
                     (new DateTime(self::VALUE_YESTERDAY))->setTime(self::HOUR_LAST, self::MINUTE_LAST, self::SECOND_LAST)
                 );
 
+
             /* Starts with <+: parses a "∞ (infinity)" to given "from" date (including given date). */
-            case preg_match('~^<\+~', $range) === 1:
+            case preg_match('~^(<[+=]|-)~', $range, $matches) === 1:
                 return new DateRange(
                     null,
-                    $this->parseRange(substr($range, 2))->getTo()
+                    $this->parseRange(substr($range, strlen($matches[1])))->getTo()
                 );
-
             /* Starts with <: parses a "∞ (infinity)" to given "from" date (excluding given date). */
             case str_starts_with($range, '<'):
                 return new DateRange(
@@ -103,20 +129,13 @@ class DateParser
                         ?->modify(sprintf('-%d seconds', self::SECONDS_A_DAY))
                 );
 
+
             /* Starts with >+: parses a given "from" (including given date) to "∞ (infinity)" date. */
-            case preg_match('~^>\+~', $range) === 1:
+            case preg_match('~^(>[+=]|[+])~', $range, $matches) === 1:
                 return new DateRange(
-                    $this->parseRange(substr($range, 2))->getFrom(),
+                    $this->parseRange(substr($range, strlen($matches[1])))->getFrom(),
                     null
                 );
-
-            /* Starts with +: parses a given "from" (including given date) to "∞ (infinity)" date. */
-            case preg_match('~^\+~', $range) === 1:
-                return new DateRange(
-                    $this->parseRange(substr($range, 1))->getFrom(),
-                    null
-                );
-
             /* Starts with >: parses a given "from" (excluding given date) to "∞ (infinity)" date. */
             case str_starts_with($range, '>'):
                 return new DateRange(
@@ -124,7 +143,8 @@ class DateParser
                     null
                 );
 
-            /* Starts with +: parses a given "from" (including given date) to "∞ (infinity)" date. */
+
+            /* Starts with |: parses a given "from" (including given date) to "to" date (including given date). */
             case str_contains($range, '|'):
                 $splitted = explode('|', $range);
                 return new DateRange(
@@ -132,7 +152,16 @@ class DateParser
                     $this->parseRange($splitted[1])->getTo()
                 );
 
-            /* Parses a given date (exactly). */
+
+            /* Starts with =: a given date exactly. */
+            case str_starts_with($range, '='):
+                return new DateRange(
+                    $this->parseRange(substr($range, 1))->getFrom(),
+                    $this->parseRange(substr($range, 1))->getTo(),
+                );
+
+
+            /* Parse the date */
             default:
                 return new DateRange(
                     $this->parseDate($range)->setTime(self::HOUR_FIRST, self::MINUTE_FIRST, self::SECOND_FIRST),
@@ -147,9 +176,14 @@ class DateParser
      * @param string $date
      * @return DateTime
      * @throws TypeInvalidException
+     * @throws ParserException
      */
     private function parseDate(string $date): DateTime
     {
+        if (!preg_match('~^[0-9]{4}-[0-9]{2}-[0-9]{2}$~', $date)) {
+            throw new ParserException($date, sprintf('String must be in the format "%s".', self::FORMAT_DATE));
+        }
+
         $date = date_create_from_format(self::FORMAT_DATE, $date);
 
         if (!$date instanceof DateTime) {

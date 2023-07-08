@@ -1,6 +1,7 @@
 # PHP Date Parser
 
 This library parses different strings to DateTime or DateTimeImmutable classes.
+Can be used e.g. excellently for command line arguments and options.
 
 ## Installation
 
@@ -44,22 +45,63 @@ $dateParser = (new DateParser('today'))->formatTo('Y-m-d H:i:s');
 
 ## Parsing formats / overview
 
-*  Imagine today would be the `2023-07-07`
+*  Imagine today would be the: `2023-07-07`
 
-| string                                  | description                                           | from                                 | to                                   |
-|-----------------------------------------|-------------------------------------------------------|--------------------------------------|--------------------------------------|
-| <nobr>`"today"`</nobr>                  | Returns the date range from today.                    | <nobr>`"2023-07-07 00:00:00"`</nobr> | <nobr>`"2023-07-07 23:59:59"`</nobr> |
-| <nobr>`"yesterday"`</nobr>              | Returns the date range from yesterday.                | <nobr>`"2023-07-06 00:00:00"`</nobr> | <nobr>`"2023-07-06 23:59:59"`</nobr> |
-| <nobr>`"2023-07-01"`</nobr>             | Exactly the given date.                               | <nobr>`"2023-07-01 00:00:00"`</nobr> | <nobr>`"2023-07-01 23:59:59"`</nobr> |
-| <nobr>`"<2023-07-01"`</nobr>            | Lower than the given date (excluding the given one).  | <nobr>`NULL`</nobr>                  | <nobr>`"2023-06-30 23:59:59"`</nobr> |
-| <nobr>`"<+2023-07-01"`</nobr>           | Lower than the given date (including the given one).  | <nobr>`NULL`</nobr>                  | <nobr>`"2023-07-01 23:59:59"`</nobr> |
-| <nobr>`">2023-07-01"`</nobr>            | Higher than the given date (excluding the given one). | <nobr>`"2023-07-02 00:00:00"`</nobr> | <nobr>`NULL`</nobr>                  |
-| <nobr>`">+2023-07-01"`</nobr>           | Higher than the given date (including the given one). | <nobr>`"2023-07-01 00:00:00"`</nobr> | <nobr>`NULL`</nobr>                  |
-| <nobr>`"+2023-07-01"`</nobr>            | Alias of `">+2023-07-01"`                             | <nobr>`"2023-07-01 00:00:00"`</nobr> | <nobr>`NULL`</nobr>                  |
-| <nobr>`"2023-07-01\|2023-07-03"`</nobr> | Date from `"2023-07-01"` to `"2023-07-03"`            | <nobr>`"2023-07-01 00:00:00"`</nobr> | <nobr>`"2023-07-03 23:59:59"`</nobr> |
-| <nobr>`"2023-07-01\|today"`</nobr>      | Date from `"2023-07-01"` to `"today"`                 | <nobr>`"2023-07-01 00:00:00"`</nobr> | <nobr>`"2023-07-07 23:59:59"`</nobr> |
-| <nobr>`"2023-07-01\|yesterday"`</nobr>  | Date from `"2023-07-01"` to `"yesterday"`             | <nobr>`"2023-07-01 00:00:00"`</nobr> | <nobr>`"2023-07-06 23:59:59"`</nobr> |
-| <nobr>`"yesterday\|today"`</nobr>       | Date from `"yesterday"` to `"today"`                  | <nobr>`"2023-07-06 00:00:00"`</nobr> | <nobr>`"2023-07-07 23:59:59"`</nobr> |
+| Given format                            | description                                      | from                                 | to                                   |
+|-----------------------------------------|--------------------------------------------------|--------------------------------------|--------------------------------------|
+| <nobr>`"tomorrow"`</nobr>               | Returns the date range from tomorrow.            | <nobr>`"2023-07-08 00:00:00"`</nobr> | <nobr>`"2023-07-08 23:59:59"`</nobr> |
+| <nobr>`"=tomorrow"`</nobr>              | Alias of `"tomorrow"`.                           | <nobr>`"2023-07-08 00:00:00"`</nobr> | <nobr>`"2023-07-08 23:59:59"`</nobr> |
+| <nobr>`"today"`</nobr>                  | Returns the date range from today.               | <nobr>`"2023-07-07 00:00:00"`</nobr> | <nobr>`"2023-07-07 23:59:59"`</nobr> |
+| <nobr>`"=today"`</nobr>                 | Alias of `"today"`.                              | <nobr>`"2023-07-07 00:00:00"`</nobr> | <nobr>`"2023-07-07 23:59:59"`</nobr> |
+| <nobr>`"yesterday"`</nobr>              | Returns the date range from yesterday.           | <nobr>`"2023-07-06 00:00:00"`</nobr> | <nobr>`"2023-07-06 23:59:59"`</nobr> |
+| <nobr>`"=yesterday"`</nobr>             | Alias of `"yesterday"`                           | <nobr>`"2023-07-06 00:00:00"`</nobr> | <nobr>`"2023-07-06 23:59:59"`</nobr> |
+| <nobr>`"2023-07-01"`</nobr>             | Exactly the given date.                          | <nobr>`"2023-07-01 00:00:00"`</nobr> | <nobr>`"2023-07-01 23:59:59"`</nobr> |
+| <nobr>`"=2023-07-01"`</nobr>            | Alias of `"2023-07-01"`                          | <nobr>`"2023-07-01 00:00:00"`</nobr> | <nobr>`"2023-07-01 23:59:59"`</nobr> |
+| -                                       | -                                                | -                                    | -                                    |
+| <nobr>`">tomorrow"`</nobr>              | Higher than tomorrow<sup>1)</sup>                | <nobr>`"2023-07-09 00:00:00"`</nobr> | <nobr>`NULL`</nobr>                  |
+| <nobr>`">=tomorrow"`</nobr>             | Higher than tomorrow<sup>2)</sup>                | <nobr>`"2023-07-08 00:00:00"`</nobr> | <nobr>`NULL`</nobr>                  |
+| <nobr>`">+tomorrow"`</nobr>             | Alias of `">=tomorrow"`                          | <nobr>`"2023-07-08 00:00:00"`</nobr> | <nobr>`NULL`</nobr>                  |
+| <nobr>`"+tomorrow"`</nobr>              | Alias of `">=tomorrow"`                          | <nobr>`"2023-07-08 00:00:00"`</nobr> | <nobr>`NULL`</nobr>                  |
+| <nobr>`">today"`</nobr>                 | Higher than today<sup>1)</sup>                   | <nobr>`"2023-07-08 00:00:00"`</nobr> | <nobr>`NULL`</nobr>                  |
+| <nobr>`">=today"`</nobr>                | Higher than today<sup>2)</sup>                   | <nobr>`"2023-07-07 00:00:00"`</nobr> | <nobr>`NULL`</nobr>                  |
+| <nobr>`">+today"`</nobr>                | Alias of `">=today"`                             | <nobr>`"2023-07-07 00:00:00"`</nobr> | <nobr>`NULL`</nobr>                  |
+| <nobr>`"+today"`</nobr>                 | Alias of `">=today"`                             | <nobr>`"2023-07-07 00:00:00"`</nobr> | <nobr>`NULL`</nobr>                  |
+| <nobr>`">yesterday"`</nobr>             | Higher than yesterday<sup>1)</sup>               | <nobr>`"2023-07-07 00:00:00"`</nobr> | <nobr>`NULL`</nobr>                  |
+| <nobr>`">=yesterday"`</nobr>            | Higher than yesterday<sup>2)</sup>               | <nobr>`"2023-07-06 00:00:00"`</nobr> | <nobr>`NULL`</nobr>                  |
+| <nobr>`">+yesterday"`</nobr>            | Alias of `">=yesterday"`                         | <nobr>`"2023-07-06 00:00:00"`</nobr> | <nobr>`NULL`</nobr>                  |
+| <nobr>`"+yesterday"`</nobr>             | Alias of `">=yesterday"`                         | <nobr>`"2023-07-06 00:00:00"`</nobr> | <nobr>`NULL`</nobr>                  |
+| <nobr>`">2023-07-01"`</nobr>            | Higher than the given date<sup>1)</sup>          | <nobr>`"2023-07-02 00:00:00"`</nobr> | <nobr>`NULL`</nobr>                  |
+| <nobr>`">=2023-07-01"`</nobr>           | Higher than the given date<sup>2)</sup>          | <nobr>`"2023-07-01 00:00:00"`</nobr> | <nobr>`NULL`</nobr>                  |
+| <nobr>`">+2023-07-01"`</nobr>           | Alias of `">=2023-07-01"`                        | <nobr>`"2023-07-01 00:00:00"`</nobr> | <nobr>`NULL`</nobr>                  |
+| <nobr>`"+2023-07-01"`</nobr>            | Alias of `">=2023-07-01"`                        | <nobr>`"2023-07-01 00:00:00"`</nobr> | <nobr>`NULL`</nobr>                  |
+| -                                       | -                                                | -                                    | -                                    |
+| <nobr>`"<tomorrow"`</nobr>              | Lower than tomorrow<sup>1)</sup>                 | <nobr>`NULL`</nobr>                  | <nobr>`"2023-07-07 23:59:59"`</nobr> |
+| <nobr>`"<=tomorrow"`</nobr>             | Lower than tomorrow<sup>2)</sup>                 | <nobr>`NULL`</nobr>                  | <nobr>`"2023-07-08 23:59:59"`</nobr> |
+| <nobr>`"<+tomorrow"`</nobr>             | Alias of `"<=tomorrow"`                          | <nobr>`NULL`</nobr>                  | <nobr>`"2023-07-08 23:59:59"`</nobr> |
+| <nobr>`"-tomorrow"`</nobr>              | Alias of `"<=tomorrow"`                          | <nobr>`NULL`</nobr>                  | <nobr>`"2023-07-08 23:59:59"`</nobr> |
+| <nobr>`"<today"`</nobr>                 | Lower than today<sup>1)</sup>                    | <nobr>`NULL`</nobr>                  | <nobr>`"2023-07-06 23:59:59"`</nobr> |
+| <nobr>`"<=today"`</nobr>                | Lower than today<sup>2)</sup>                    | <nobr>`NULL`</nobr>                  | <nobr>`"2023-07-07 23:59:59"`</nobr> |
+| <nobr>`"<+today"`</nobr>                | Alias of `"<=today"`                             | <nobr>`NULL`</nobr>                  | <nobr>`"2023-07-07 23:59:59"`</nobr> |
+| <nobr>`"-today"`</nobr>                 | Alias of `"<=today"`                             | <nobr>`NULL`</nobr>                  | <nobr>`"2023-07-07 23:59:59"`</nobr> |
+| <nobr>`"<yesterday"`</nobr>             | Lower than yesterday<sup>1)</sup>                | <nobr>`NULL`</nobr>                  | <nobr>`"2023-07-05 23:59:59"`</nobr> |
+| <nobr>`"<=yesterday"`</nobr>            | Lower than yesterday<sup>2)</sup>                | <nobr>`NULL`</nobr>                  | <nobr>`"2023-07-06 23:59:59"`</nobr> |
+| <nobr>`"<+yesterday"`</nobr>            | Alias of `"<=yesterday"`                         | <nobr>`NULL`</nobr>                  | <nobr>`"2023-07-06 23:59:59"`</nobr> |
+| <nobr>`"-yesterday"`</nobr>             | Alias of `"<=yesterday"`                         | <nobr>`NULL`</nobr>                  | <nobr>`"2023-07-06 23:59:59"`</nobr> |
+| <nobr>`"<2023-07-01"`</nobr>            | Lower than the given date<sup>1)</sup>           | <nobr>`NULL`</nobr>                  | <nobr>`"2023-06-30 23:59:59"`</nobr> |
+| <nobr>`"<=2023-07-01"`</nobr>           | Lower than the given date<sup>2)</sup>           | <nobr>`NULL`</nobr>                  | <nobr>`"2023-07-01 23:59:59"`</nobr> |
+| <nobr>`"<+2023-07-01"`</nobr>           | Alias of `"<=2023-07-01"`                        | <nobr>`NULL`</nobr>                  | <nobr>`"2023-07-01 23:59:59"`</nobr> |
+| <nobr>`"-2023-07-01"`</nobr>            | Alias of `"<=2023-07-01"`                        | <nobr>`NULL`</nobr>                  | <nobr>`"2023-07-01 23:59:59"`</nobr> |
+| -                                       | -                                                | -                                    | -                                    |
+| <nobr>`"2023-07-01\|2023-07-03"`</nobr> | Date range from `"2023-07-01"` to `"2023-07-03"` | <nobr>`"2023-07-01 00:00:00"`</nobr> | <nobr>`"2023-07-03 23:59:59"`</nobr> |
+| <nobr>`"2023-07-01\|tomorrow"`</nobr>   | Date range from `"2023-07-01"` to `"tomorrow"`   | <nobr>`"2023-07-01 00:00:00"`</nobr> | <nobr>`"2023-07-08 23:59:59"`</nobr> |
+| <nobr>`"2023-07-01\|today"`</nobr>      | Date range from `"2023-07-01"` to `"today"`      | <nobr>`"2023-07-01 00:00:00"`</nobr> | <nobr>`"2023-07-07 23:59:59"`</nobr> |
+| <nobr>`"2023-07-01\|yesterday"`</nobr>  | Date range from `"2023-07-01"` to `"yesterday"`  | <nobr>`"2023-07-01 00:00:00"`</nobr> | <nobr>`"2023-07-06 23:59:59"`</nobr> |
+| <nobr>`"yesterday\|today"`</nobr>       | Date range from `"yesterday"` to `"today"`       | <nobr>`"2023-07-06 00:00:00"`</nobr> | <nobr>`"2023-07-07 23:59:59"`</nobr> |
+| -                                       | -                                                | -                                    | -                                    |
+| <nobr>`NULL`</nobr>                     | No range given (infinitive range).               | <nobr>`NULL`</nobr>                  | <nobr>`NULL`</nobr>                  |
+
+* <sup>1)</sup> - excluding the given one
+* <sup>2)</sup> - including the given one
 
 ## Methods
 
