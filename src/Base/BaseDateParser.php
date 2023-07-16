@@ -14,8 +14,11 @@ declare(strict_types=1);
 namespace Ixnode\PhpDateParser\Base;
 
 use DateTime;
+use DateTimeImmutable;
+use DateTimeZone;
 use Exception;
 use Ixnode\PhpDateParser\DateRange;
+use Ixnode\PhpException\Case\CaseUnsupportedException;
 use Ixnode\PhpException\Parser\ParserException;
 use Ixnode\PhpException\Type\TypeInvalidException;
 
@@ -52,6 +55,8 @@ class BaseDateParser
 
     final public const FORMAT_THIS_YEAR_LAST = 'Y-12-31';
 
+    final public const VALUE_NOW = 'now';
+
     final public const VALUE_TOMORROW = 'tomorrow';
 
     final public const VALUE_TODAY = 'today';
@@ -78,10 +83,11 @@ class BaseDateParser
 
     /**
      * @param string|null $range
-     * @throws TypeInvalidException
+     * @param DateTimeZone $dateTimeZoneInput
      * @throws ParserException
+     * @throws TypeInvalidException
      */
-    public function __construct(string|null $range)
+    public function __construct(string|null $range, protected DateTimeZone $dateTimeZoneInput = new DateTimeZone('UTC'))
     {
         $this->range = !is_null($range) ? trim(strtolower($range)) : null;
 
@@ -102,7 +108,7 @@ class BaseDateParser
     private function parseRange(string|null $range): DateRange
     {
         if (is_null($range)) {
-            return new DateRange(
+            return $this->getDateRangeInstance(
                 null,
                 null
             );
@@ -114,30 +120,30 @@ class BaseDateParser
 
             /* Parses "tomorrow" date. */
             case $range === self::VALUE_TOMORROW:
-                return new DateRange(
-                    (new DateTime(self::VALUE_TOMORROW))->setTime(self::HOUR_FIRST, self::MINUTE_FIRST, self::SECOND_FIRST),
-                    (new DateTime(self::VALUE_TOMORROW))->setTime(self::HOUR_LAST, self::MINUTE_LAST, self::SECOND_LAST)
+                return $this->getDateRangeInstance(
+                    $this->getDateTimeRaw(self::VALUE_TOMORROW, self::HOUR_FIRST, self::MINUTE_FIRST, self::SECOND_FIRST),
+                    $this->getDateTimeRaw(self::VALUE_TOMORROW, self::HOUR_LAST, self::MINUTE_LAST, self::SECOND_LAST)
                 );
             /* Parses "today" date. */
             case $range === self::VALUE_TODAY:
-                return new DateRange(
-                    (new DateTime())->setTime(self::HOUR_FIRST, self::MINUTE_FIRST, self::SECOND_FIRST),
-                    (new DateTime())->setTime(self::HOUR_LAST, self::MINUTE_LAST, self::SECOND_LAST)
+                return $this->getDateRangeInstance(
+                    $this->getDateTimeRaw(self::VALUE_NOW, self::HOUR_FIRST, self::MINUTE_FIRST, self::SECOND_FIRST),
+                    $this->getDateTimeRaw(self::VALUE_NOW, self::HOUR_LAST, self::MINUTE_LAST, self::SECOND_LAST)
                 );
             /* Parses "yesterday" date. */
             case $range === self::VALUE_YESTERDAY:
-                return new DateRange(
-                    (new DateTime(self::VALUE_YESTERDAY))->setTime(self::HOUR_FIRST, self::MINUTE_FIRST, self::SECOND_FIRST),
-                    (new DateTime(self::VALUE_YESTERDAY))->setTime(self::HOUR_LAST, self::MINUTE_LAST, self::SECOND_LAST)
+                return $this->getDateRangeInstance(
+                    $this->getDateTimeRaw(self::VALUE_YESTERDAY, self::HOUR_FIRST, self::MINUTE_FIRST, self::SECOND_FIRST),
+                    $this->getDateTimeRaw(self::VALUE_YESTERDAY, self::HOUR_LAST, self::MINUTE_LAST, self::SECOND_LAST)
                 );
             /* Parses "next-month" date. */
             case $range === self::VALUE_NEXT_MONTH:
                 return $this->getDateRangeNextMonth();
             /* Parses "this-month" date. */
             case $range === self::VALUE_THIS_MONTH:
-                return new DateRange(
-                    (new DateTime(date(self::FORMAT_THIS_MONTH_FIRST)))->setTime(self::HOUR_FIRST, self::MINUTE_FIRST, self::SECOND_FIRST),
-                    (new DateTime(date(self::FORMAT_THIS_MONTH_LAST)))->setTime(self::HOUR_LAST, self::MINUTE_LAST, self::SECOND_LAST)
+                return $this->getDateRangeInstance(
+                    $this->getDateTimeRaw(date(self::FORMAT_THIS_MONTH_FIRST), self::HOUR_FIRST, self::MINUTE_FIRST, self::SECOND_FIRST),
+                    $this->getDateTimeRaw(date(self::FORMAT_THIS_MONTH_LAST), self::HOUR_LAST, self::MINUTE_LAST, self::SECOND_LAST)
                 );
             /* Parses "last-month" date. */
             case $range === self::VALUE_LAST_MONTH:
@@ -147,9 +153,9 @@ class BaseDateParser
                 return $this->getDateRangeNextYear();
             /* Parses "this-year" date. */
             case $range === self::VALUE_THIS_YEAR:
-                return new DateRange(
-                    (new DateTime(date(self::FORMAT_THIS_YEAR_FIRST)))->setTime(self::HOUR_FIRST, self::MINUTE_FIRST, self::SECOND_FIRST),
-                    (new DateTime(date(self::FORMAT_THIS_YEAR_LAST)))->setTime(self::HOUR_LAST, self::MINUTE_LAST, self::SECOND_LAST)
+                return $this->getDateRangeInstance(
+                    $this->getDateTimeRaw(date(self::FORMAT_THIS_YEAR_FIRST), self::HOUR_FIRST, self::MINUTE_FIRST, self::SECOND_FIRST),
+                    $this->getDateTimeRaw(date(self::FORMAT_THIS_YEAR_LAST), self::HOUR_LAST, self::MINUTE_LAST, self::SECOND_LAST)
                 );
             /* Parses "last-year" date. */
             case $range === self::VALUE_LAST_YEAR:
@@ -158,13 +164,13 @@ class BaseDateParser
 
             /* Starts with <+: parses a "∞ (infinity)" to given "from" date (including given date). */
             case preg_match('~^(<[+=]|-)~', $range, $matches) === 1:
-                return new DateRange(
+                return $this->getDateRangeInstance(
                     null,
                     $this->parseRange(substr($range, strlen($matches[1])))->getTo()
                 );
             /* Starts with <: parses a "∞ (infinity)" to given "from" date (excluding given date). */
             case str_starts_with($range, '<'):
-                return new DateRange(
+                return $this->getDateRangeInstance(
                     null,
                     $this->parseRange(substr($range, 1))
                         ->getTo()
@@ -174,13 +180,13 @@ class BaseDateParser
 
             /* Starts with >+: parses a given "from" (including given date) to "∞ (infinity)" date. */
             case preg_match('~^(>[+=]|[+])~', $range, $matches) === 1:
-                return new DateRange(
+                return $this->getDateRangeInstance(
                     $this->parseRange(substr($range, strlen($matches[1])))->getFrom(),
                     null
                 );
             /* Starts with >: parses a given "from" (excluding given date) to "∞ (infinity)" date. */
             case str_starts_with($range, '>'):
-                return new DateRange(
+                return $this->getDateRangeInstance(
                     $this->parseRange(substr($range, 1))->getTo()?->modify('+1 second'),
                     null
                 );
@@ -189,7 +195,7 @@ class BaseDateParser
             /* Starts with |: parses a given "from" (including given date) to "to" date (including given date). */
             case str_contains($range, '|'):
                 $splitted = explode('|', $range);
-                return new DateRange(
+                return $this->getDateRangeInstance(
                     $this->parseRange($splitted[0])->getFrom(),
                     $this->parseRange($splitted[1])->getTo()
                 );
@@ -197,7 +203,7 @@ class BaseDateParser
 
             /* Starts with =: a given date exactly. */
             case str_starts_with($range, '='):
-                return new DateRange(
+                return $this->getDateRangeInstance(
                     $this->parseRange(substr($range, 1))->getFrom(),
                     $this->parseRange(substr($range, 1))->getTo(),
                 );
@@ -205,7 +211,7 @@ class BaseDateParser
 
             /* Parse the date */
             default:
-                return new DateRange(
+                return $this->getDateRangeInstance(
                     $this->parseDate($range)->setTime(self::HOUR_FIRST, self::MINUTE_FIRST, self::SECOND_FIRST),
                     $this->parseDate($range)->setTime(self::HOUR_LAST, self::MINUTE_LAST, self::SECOND_LAST),
                 );
@@ -227,7 +233,7 @@ class BaseDateParser
         $lastNextMonth = (new DateTime($firstNextMonth->format(self::FORMAT_THIS_MONTH_LAST)))
             ->setTime(self::HOUR_LAST, self::MINUTE_LAST, self::SECOND_LAST);
 
-        return new DateRange($firstNextMonth, $lastNextMonth);
+        return $this->getDateRangeInstance($firstNextMonth, $lastNextMonth);
     }
 
     /**
@@ -246,7 +252,7 @@ class BaseDateParser
         $firstLastMonth = (new DateTime($lastLastMonth->format(self::FORMAT_THIS_MONTH_FIRST)))
             ->setTime(self::HOUR_FIRST, self::MINUTE_FIRST, self::SECOND_FIRST);
 
-        return new DateRange($firstLastMonth, $lastLastMonth);
+        return $this->getDateRangeInstance($firstLastMonth, $lastLastMonth);
     }
 
     /**
@@ -264,7 +270,7 @@ class BaseDateParser
         $lastNextYear = (new DateTime($firstNextYear->format(self::FORMAT_THIS_YEAR_LAST)))
             ->setTime(self::HOUR_LAST, self::MINUTE_LAST, self::SECOND_LAST);
 
-        return new DateRange($firstNextYear, $lastNextYear);
+        return $this->getDateRangeInstance($firstNextYear, $lastNextYear);
     }
 
     /**
@@ -283,7 +289,7 @@ class BaseDateParser
         $firstLastYear = (new DateTime($lastLastYear->format(self::FORMAT_THIS_YEAR_FIRST)))
             ->setTime(self::HOUR_FIRST, self::MINUTE_FIRST, self::SECOND_FIRST);
 
-        return new DateRange($firstLastYear, $lastLastYear);
+        return $this->getDateRangeInstance($firstLastYear, $lastLastYear);
     }
 
     /**
@@ -307,5 +313,32 @@ class BaseDateParser
         }
 
         return $date;
+    }
+
+    /**
+     * @param string $dateTime
+     * @param int $hour
+     * @param int $minute
+     * @param int $second
+     * @return DateTime
+     * @throws Exception
+     */
+    protected function getDateTimeRaw(string $dateTime, int $hour, int $minute, int $second): DateTime
+    {
+        return (new DateTime($dateTime))->setTime($hour, $minute, $second);
+    }
+
+    /**
+     * Returns the DateRange instance from given date range.
+     *
+     * @param DateTime|DateTimeImmutable|null $from
+     * @param DateTime|DateTimeImmutable|null $to
+     * @return DateRange
+     * @throws CaseUnsupportedException
+     * @SuppressWarnings(PHPMD.ShortVariable)
+     */
+    protected function getDateRangeInstance(DateTime|DateTimeImmutable|null $from, DateTime|DateTimeImmutable|null $to): DateRange
+    {
+        return new DateRange($from, $to, $this->dateTimeZoneInput);
     }
 }

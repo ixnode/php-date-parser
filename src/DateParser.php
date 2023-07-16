@@ -15,7 +15,9 @@ namespace Ixnode\PhpDateParser;
 
 use DateTime;
 use DateTimeImmutable;
+use DateTimeZone;
 use Ixnode\PhpDateParser\Base\BaseDateParser;
+use Ixnode\PhpDateParser\Constants\Timezones;
 use Ixnode\PhpDateParser\Tests\Unit\DateParserTest;
 
 /**
@@ -42,61 +44,67 @@ class DateParser extends BaseDateParser
      * Returns the "from" date as string.
      *
      * @param string $format
+     * @param DateTimeZone $dateTimeZoneOutput
      * @return string|null
      */
-    public function formatFrom(string $format): string|null
+    public function formatFrom(string $format, DateTimeZone $dateTimeZoneOutput = new DateTimeZone(Timezones::UTC)): string|null
     {
-        return $this->dateRange->getFrom()?->format($format);
+        return $this->dateRange->getFrom($dateTimeZoneOutput)?->format($format);
     }
 
     /**
      * Returns the "to" date as string.
      *
      * @param string $format
+     * @param DateTimeZone $dateTimeZoneOutput
      * @return string|null
      */
-    public function formatTo(string $format): string|null
+    public function formatTo(string $format, DateTimeZone $dateTimeZoneOutput = new DateTimeZone(Timezones::UTC)): string|null
     {
-        return $this->dateRange->getTo()?->format($format);
+        return $this->dateRange->getTo($dateTimeZoneOutput)?->format($format);
     }
 
     /**
      * Returns the "from" date as DateTime object.
      *
+     * @param DateTimeZone $dateTimeZoneOutput
      * @return DateTime|null
      */
-    public function getFrom(): DateTime|null
+    public function getFrom(DateTimeZone $dateTimeZoneOutput = new DateTimeZone(Timezones::UTC)): DateTime|null
     {
-        return $this->dateRange->getFrom();
+        return $this->dateRange->getFrom($dateTimeZoneOutput);
     }
 
     /**
      * Returns the "to" date as DateTime object.
      *
+     * @param DateTimeZone $dateTimeZoneOutput
      * @return DateTime|null
      */
-    public function getTo(): DateTime|null
+    public function getTo(DateTimeZone $dateTimeZoneOutput = new DateTimeZone(Timezones::UTC)): DateTime|null
     {
-        return $this->dateRange->getTo();
+        return $this->dateRange->getTo($dateTimeZoneOutput);
     }
 
     /**
      * Returns the "from" date as DateTimeImmutable object.
      *
+     * @param DateTimeZone $dateTimeZoneOutput
      * @return DateTimeImmutable|null
      */
-    public function getFromImmutable(): DateTimeImmutable|null
+    public function getFromImmutable(DateTimeZone $dateTimeZoneOutput = new DateTimeZone(Timezones::UTC)): DateTimeImmutable|null
     {
-        return $this->dateRange->getFromImmutable();
+        return $this->dateRange->getFromImmutable($dateTimeZoneOutput);
     }
 
     /**
      * Returns the "to" date as DateTimeImmutable object.
      *
+     * @param DateTimeZone $dateTimeZoneOutput
      * @return DateTimeImmutable|null
      */
-    public function getToImmutable(): DateTimeImmutable|null
+    public function getToImmutable(DateTimeZone $dateTimeZoneOutput = new DateTimeZone(Timezones::UTC)): DateTimeImmutable|null
     {
-        return $this->dateRange->getToImmutable();
+        return $this->dateRange->getToImmutable($dateTimeZoneOutput);
     }
 }

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Releases
 
+### [0.1.6] - 2023-07-16
+
+* Add timezone support
+
 ### [0.1.5] - 2023-07-09
 
 * Add more parser options like next-year, last-year, etc.

@@ -43,6 +43,16 @@ $dateParser = (new DateParser('today'))->formatTo('Y-m-d H:i:s');
 // 2023-07-07 23:59:59
 ```
 
+### Timezones
+
+```php
+$dateParser = (new DateParser('<2023-07-01', 'America/New_York'))->formatFrom('Y-m-d H:i:s', 'Europe/Berlin');
+// null
+
+$dateParser = (new DateParser('<2023-07-01', 'America/New_York'))->formatTo('Y-m-d H:i:s', 'Europe/Berlin');
+// 2023-07-01 09:59:59
+```
+
 ## Parsing formats
 
 ### Supported words
