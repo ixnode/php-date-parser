@@ -1,7 +1,9 @@
 # PHP Date Parser
 
-This library parses different strings to DateTime or DateTimeImmutable classes.
-Can be used e.g. excellently for command line arguments and options.
+This library parses various given date and time strings into
+DateTime or DateTimeImmutable classes which return the time
+range. Can be used e.g. excellently for command line
+arguments and options to make database queries with.
 
 ## Installation
 
@@ -57,17 +59,26 @@ $dateParser = (new DateParser('<2023-07-01', 'America/New_York'))->formatTo('Y-m
 
 ### Supported words
 
-| Word         | Description                   |
-|--------------|-------------------------------|
-| `tomorrow`   | The day tomorrow (`'j' + 1`)  |
-| `today`      | The day today (`'j'`)         |
-| `yesterday`  | The day yesterday (`'j' - 1`) |
-| `next-month` | Next month (`'n' + 1`)        |
-| `this-month` | This month (`'n'`)            |
-| `last-month` | Last month (`'n' - 1`)        |
-| `next-year`  | Next year (`'Y' + 1`)         |
-| `this-year`  | This year (`'Y'`)             |
-| `last-year`  | Last year (`'Y' - 1`)         |
+| Word          | Description                   |
+|---------------|-------------------------------|
+| `next-second` | Next second (`'s' + 1`)       |
+| `this-second` | This second (`'s'`)           |
+| `last-second` | Last second (`'s' - 1`)       |
+| `next-minute` | Next minute (`'i' + 1`)       |
+| `this-minute` | This minute (`'i'`)           |
+| `last-minute` | Last minute (`'i' - 1`)       |
+| `next-hour`   | Next hour (`'G' + 1`)         |
+| `this-hour`   | This hour (`'G'`)             |
+| `last-hour`   | Last hour (`'G' - 1`)         |
+| `tomorrow`    | The day tomorrow (`'j' + 1`)  |
+| `today`       | The day today (`'j'`)         |
+| `yesterday`   | The day yesterday (`'j' - 1`) |
+| `next-month`  | Next month (`'n' + 1`)        |
+| `this-month`  | This month (`'n'`)            |
+| `last-month`  | Last month (`'n' - 1`)        |
+| `next-year`   | Next year (`'Y' + 1`)         |
+| `this-year`   | This year (`'Y'`)             |
+| `last-year`   | Last year (`'Y' - 1`)         |
 
 ### Overview
 

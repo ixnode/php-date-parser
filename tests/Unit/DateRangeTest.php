@@ -16,6 +16,7 @@ namespace Ixnode\PhpDateParser\Tests\Unit;
 use DateTime;
 use DateTimeImmutable;
 use Ixnode\PhpDateParser\DateRange;
+use Ixnode\PhpException\Case\CaseUnsupportedException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -42,6 +43,7 @@ final class DateRangeTest extends TestCase
      * @param DateTime|DateTimeImmutable|null $to
      * @param class-string|null $expected
      * @SuppressWarnings(PHPMD.ShortVariable)
+     * @throws CaseUnsupportedException
      */
     public function wrapperType(
         int $number,

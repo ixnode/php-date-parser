@@ -1,9 +1,9 @@
 {
   "name": "ixnode/php-date-parser",
-  "description": "PHP Date Parser - This library parses different strings to DateTime or DateTimeImmutable classes.",
+  "description": "PHP Date Parser - This library parses various given date and time strings into DateTime or DateTimeImmutable classes which return the time range. Can be used e.g. excellently for command line arguments and options to make database queries with.",
   "type": "library",
   "license": "MIT",
-  "keywords": ["php", "date", "parser", "conversion"],
+  "keywords": ["php", "date", "time", "parser", "conversion", "DateTime", "DateTimeImmutable"],
   "authors": [
     {
       "name": "Björn Hempel",
@@ -22,7 +22,8 @@
     }
   },
   "require": {
-    "php": "^8.2"
+    "php": "^8.2",
+    "ixnode/php-naming-conventions": "^0.1.1"
   },
   "require-dev": {
     "phpunit/phpunit": "^9.5",
@@ -44,7 +45,7 @@
       "@phpmnd:all"
     ],
 
-    "phpmd": "bin/header/phpmnd 'phpmd src,tests text cleancode,codesize,controversial,design,naming,unusedcode' 'all'",
+    "phpmd": "bin/header/phpmd 'phpmd src,tests text cleancode,codesize,controversial,design,naming,unusedcode' 'all'",
 
     "phpunit": "bin/header/phpunit 'phpunit --stop-on-failure tests' 'Unit'",
 

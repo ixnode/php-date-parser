@@ -33,6 +33,7 @@ use PHPUnit\Framework\TestCase;
  * @since 0.1.0 (2023-06-30) First version.
  * @link DateParser
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 final class DateParserTest extends TestCase
 {
@@ -44,10 +45,19 @@ final class DateParserTest extends TestCase
      * Test wrapper.
      *
      * @dataProvider dataProviderNone
+     *
      * @dataProvider dataProviderDateExactly
+     * @dataProvider dataProviderDateTimeExactly
+     *
      * @dataProvider dataProviderDateToInfinity
+     * @dataProvider dataProviderDateTimeToInfinity
+     *
      * @dataProvider dataProviderInfinityToDate
+     * @dataProvider dataProviderInfinityToDateTime
+     *
      * @dataProvider dataProviderDateFromToTo
+     * @dataProvider dataProviderDateTimeFromToTo
+     *
      * @dataProvider dataProviderDateTimezones
      *
      * @test
@@ -118,112 +128,352 @@ final class DateParserTest extends TestCase
         return [
 
             /**
-             * Parses a given date (exactly): tomorrow.
+             * Parses a given date (exactly): next-second.
              */
-            $this->getConfigFrom('tomorrow', $this->getTomorrow(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
-            $this->getConfigTo('tomorrow', $this->getTomorrow(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigFrom('next-second', $this->getToday($this->getThisHour(), $this->getThisMinute(), $this->getThisSecond())
+                ->modify(sprintf('+%d seconds', BaseDateParser::SECONDS_A_SECOND))
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('next-second', $this->getToday($this->getThisHour(), $this->getThisMinute(), $this->getThisSecond())
+                ->modify(sprintf('+%d seconds', BaseDateParser::SECONDS_A_SECOND))
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+            /**
+             * Parses a given date (exactly): next-second.
+             */
+            $this->getConfigFrom('=next-second', $this->getToday($this->getThisHour(), $this->getThisMinute(), $this->getThisSecond())
+                ->modify(sprintf('+%d seconds', BaseDateParser::SECONDS_A_SECOND))
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('=next-second', $this->getToday($this->getThisHour(), $this->getThisMinute(), $this->getThisSecond())
+                ->modify(sprintf('+%d seconds', BaseDateParser::SECONDS_A_SECOND))
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+
+
+            /**
+             * Parses a given date (exactly): this-second.
+             */
+            $this->getConfigFrom('this-second', $this->getToday($this->getThisHour(), $this->getThisMinute(), $this->getThisSecond())
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('this-second', $this->getToday($this->getThisHour(), $this->getThisMinute(), $this->getThisSecond())
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+            /**
+             * Parses a given date (exactly): this-second.
+             */
+            $this->getConfigFrom('=this-second', $this->getToday($this->getThisHour(), $this->getThisMinute(), $this->getThisSecond())
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('=this-second', $this->getToday($this->getThisHour(), $this->getThisMinute(), $this->getThisSecond())
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+
+
+            /**
+             * Parses a given date (exactly): last-second.
+             */
+            $this->getConfigFrom('last-second', $this->getToday($this->getThisHour(), $this->getThisMinute(), $this->getThisSecond())
+                ->modify(sprintf('-%d seconds', BaseDateParser::SECONDS_A_SECOND))
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('last-second', $this->getToday($this->getThisHour(), $this->getThisMinute(), $this->getThisSecond())
+                ->modify(sprintf('-%d seconds', BaseDateParser::SECONDS_A_SECOND))
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+            /**
+             * Parses a given date (exactly): last-second.
+             */
+            $this->getConfigFrom('=last-second', $this->getToday($this->getThisHour(), $this->getThisMinute(), $this->getThisSecond())
+                ->modify(sprintf('-%d seconds', BaseDateParser::SECONDS_A_SECOND))
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('=last-second', $this->getToday($this->getThisHour(), $this->getThisMinute(), $this->getThisSecond())
+                ->modify(sprintf('-%d seconds', BaseDateParser::SECONDS_A_SECOND))
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+
+
+            /**
+             * Parses a given date (exactly): next-minute.
+             */
+            $this->getConfigFrom('next-minute', $this->getToday($this->getThisHour(), $this->getThisMinute(), BaseDateParser::SECOND_FIRST)
+                ->modify(sprintf('+%d seconds', BaseDateParser::SECONDS_A_MINUTE))
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('next-minute', $this->getToday($this->getThisHour(), $this->getThisMinute(), BaseDateParser::SECOND_LAST)
+                ->modify(sprintf('+%d seconds', BaseDateParser::SECONDS_A_MINUTE))
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+            /**
+             * Parses a given date (exactly): next-minute.
+             */
+            $this->getConfigFrom('=next-minute', $this->getToday($this->getThisHour(), $this->getThisMinute(), BaseDateParser::SECOND_FIRST)
+                ->modify(sprintf('+%d seconds', BaseDateParser::SECONDS_A_MINUTE))
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('=next-minute', $this->getToday($this->getThisHour(), $this->getThisMinute(), BaseDateParser::SECOND_LAST)
+                ->modify(sprintf('+%d seconds', BaseDateParser::SECONDS_A_MINUTE))
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+
+
+            /**
+             * Parses a given date (exactly): this-minute.
+             */
+            $this->getConfigFrom('this-minute', $this->getToday($this->getThisHour(), $this->getThisMinute(), BaseDateParser::SECOND_FIRST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('this-minute', $this->getToday($this->getThisHour(), $this->getThisMinute(), BaseDateParser::SECOND_LAST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+            /**
+             * Parses a given date (exactly): this-minute.
+             */
+            $this->getConfigFrom('=this-minute', $this->getToday($this->getThisHour(), $this->getThisMinute(), BaseDateParser::SECOND_FIRST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('=this-minute', $this->getToday($this->getThisHour(), $this->getThisMinute(), BaseDateParser::SECOND_LAST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+
+
+            /**
+             * Parses a given date (exactly): last-minute.
+             */
+            $this->getConfigFrom('last-minute', $this->getToday($this->getThisHour(), $this->getThisMinute(), BaseDateParser::SECOND_FIRST)
+                ->modify(sprintf('-%d seconds', BaseDateParser::SECONDS_A_MINUTE))
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('last-minute', $this->getToday($this->getThisHour(), $this->getThisMinute(), BaseDateParser::SECOND_LAST)
+                ->modify(sprintf('-%d seconds', BaseDateParser::SECONDS_A_MINUTE))
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+            /**
+             * Parses a given date (exactly): last-minute.
+             */
+            $this->getConfigFrom('=last-minute', $this->getToday($this->getThisHour(), $this->getThisMinute(), BaseDateParser::SECOND_FIRST)
+                ->modify(sprintf('-%d seconds', BaseDateParser::SECONDS_A_MINUTE))
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('=last-minute', $this->getToday($this->getThisHour(), $this->getThisMinute(), BaseDateParser::SECOND_LAST)
+                ->modify(sprintf('-%d seconds', BaseDateParser::SECONDS_A_MINUTE))
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+
+
+            /**
+             * Parses a given date (exactly): next-hour.
+             */
+            $this->getConfigFrom('next-hour', $this->getToday($this->getThisHour(), BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)
+                ->modify(sprintf('+%d seconds', BaseDateParser::SECONDS_AN_HOUR))
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('next-hour', $this->getToday($this->getThisHour(), BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)
+                ->modify(sprintf('+%d seconds', BaseDateParser::SECONDS_AN_HOUR))
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+            /**
+             * Parses a given date (exactly): next-hour.
+             */
+            $this->getConfigFrom('=next-hour', $this->getToday($this->getThisHour(), BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)
+                ->modify(sprintf('+%d seconds', BaseDateParser::SECONDS_AN_HOUR))
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('=next-hour', $this->getToday($this->getThisHour(), BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)
+                ->modify(sprintf('+%d seconds', BaseDateParser::SECONDS_AN_HOUR))
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+
+
+            /**
+             * Parses a given date (exactly): this-hour.
+             */
+            $this->getConfigFrom('this-hour', $this->getToday($this->getThisHour(), BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('this-hour', $this->getToday($this->getThisHour(), BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+            /**
+             * Parses a given date (exactly): this-hour.
+             */
+            $this->getConfigFrom('=this-hour', $this->getToday($this->getThisHour(), BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('=this-hour', $this->getToday($this->getThisHour(), BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+
+
+            /**
+             * Parses a given date (exactly): last-hour.
+             */
+            $this->getConfigFrom('last-hour', $this->getToday($this->getThisHour(), BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)
+                ->modify(sprintf('-%d seconds', BaseDateParser::SECONDS_AN_HOUR))
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('last-hour', $this->getToday($this->getThisHour(), BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)
+                ->modify(sprintf('-%d seconds', BaseDateParser::SECONDS_AN_HOUR))
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+            /**
+             * Parses a given date (exactly): last-hour.
+             */
+            $this->getConfigFrom('=last-hour', $this->getToday($this->getThisHour(), BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)
+                ->modify(sprintf('-%d seconds', BaseDateParser::SECONDS_AN_HOUR))
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('=last-hour', $this->getToday($this->getThisHour(), BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)
+                ->modify(sprintf('-%d seconds', BaseDateParser::SECONDS_AN_HOUR))
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+
 
             /**
              * Parses a given date (exactly): tomorrow.
              */
-            $this->getConfigFrom('=tomorrow', $this->getTomorrow(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
-            $this->getConfigTo('=tomorrow', $this->getTomorrow(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigFrom('tomorrow', $this->getTomorrow(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('tomorrow', $this->getTomorrow(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+            /**
+             * Parses a given date (exactly): tomorrow.
+             */
+            $this->getConfigFrom('=tomorrow', $this->getTomorrow(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('=tomorrow', $this->getTomorrow(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+
 
             /**
              * Parses a given date (exactly): today.
              */
-            $this->getConfigFrom('today', $this->getToday(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
-            $this->getConfigTo('today', $this->getToday(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigFrom('today', $this->getToday(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('today', $this->getToday(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
 
             /**
              * Parses a given date (exactly): today.
              */
-            $this->getConfigFrom('=today', $this->getToday(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
-            $this->getConfigTo('=today', $this->getToday(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigFrom('=today', $this->getToday(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('=today', $this->getToday(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+
 
             /**
              * Parses a given date (exactly): yesterday.
              */
-            $this->getConfigFrom('yesterday', $this->getYesterday(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
-            $this->getConfigTo('yesterday', $this->getYesterday(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigFrom('yesterday', $this->getYesterday(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('yesterday', $this->getYesterday(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
 
             /**
              * Parses a given date (exactly): yesterday.
              */
-            $this->getConfigFrom('=yesterday', $this->getYesterday(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
-            $this->getConfigTo('=yesterday', $this->getYesterday(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigFrom('=yesterday', $this->getYesterday(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('=yesterday', $this->getYesterday(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+
 
             /**
              * Parses a given date (exactly): next-month.
              */
-            $this->getConfigFrom('next-month', $this->getFirstNextMonth(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
-            $this->getConfigTo('next-month', $this->getLastNextMonth(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigFrom('next-month', $this->getFirstNextMonth(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('next-month', $this->getLastNextMonth(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
 
             /**
              * Parses a given date (exactly): next-month.
              */
-            $this->getConfigFrom('=next-month', $this->getFirstNextMonth(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
-            $this->getConfigTo('=next-month', $this->getLastNextMonth(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigFrom('=next-month', $this->getFirstNextMonth(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('=next-month', $this->getLastNextMonth(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+
 
             /**
              * Parses a given date (exactly): this-month.
              */
-            $this->getConfigFrom('this-month', $this->getFirstThisMonth(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
-            $this->getConfigTo('this-month', $this->getLastThisMonth(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigFrom('this-month', $this->getFirstThisMonth(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('this-month', $this->getLastThisMonth(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
 
             /**
              * Parses a given date (exactly): this-month.
              */
-            $this->getConfigFrom('=this-month', $this->getFirstThisMonth(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
-            $this->getConfigTo('=this-month', $this->getLastThisMonth(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigFrom('=this-month', $this->getFirstThisMonth(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('=this-month', $this->getLastThisMonth(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+
 
             /**
              * Parses a given date (exactly): last-month.
              */
-            $this->getConfigFrom('last-month', $this->getFirstLastMonth(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
-            $this->getConfigTo('last-month', $this->getLastLastMonth(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigFrom('last-month', $this->getFirstLastMonth(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('last-month', $this->getLastLastMonth(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
 
             /**
              * Parses a given date (exactly): last-month.
              */
-            $this->getConfigFrom('=last-month', $this->getFirstLastMonth(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
-            $this->getConfigTo('=last-month', $this->getLastLastMonth(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigFrom('=last-month', $this->getFirstLastMonth(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('=last-month', $this->getLastLastMonth(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+
 
             /**
              * Parses a given date (exactly): next-year.
              */
-            $this->getConfigFrom('next-year', $this->getFirstNextYear(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
-            $this->getConfigTo('next-year', $this->getLastNextYear(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigFrom('next-year', $this->getFirstNextYear(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('next-year', $this->getLastNextYear(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
 
             /**
              * Parses a given date (exactly): next-year.
              */
-            $this->getConfigFrom('=next-year', $this->getFirstNextYear(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
-            $this->getConfigTo('=next-year', $this->getLastNextYear(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigFrom('=next-year', $this->getFirstNextYear(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('=next-year', $this->getLastNextYear(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+
 
             /**
              * Parses a given date (exactly): this-year.
              */
-            $this->getConfigFrom('this-year', $this->getFirstThisYear(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
-            $this->getConfigTo('this-year', $this->getLastThisYear(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigFrom('this-year', $this->getFirstThisYear(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('this-year', $this->getLastThisYear(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
 
             /**
              * Parses a given date (exactly): this-year.
              */
-            $this->getConfigFrom('=this-year', $this->getFirstThisYear(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
-            $this->getConfigTo('=this-year', $this->getLastThisYear(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigFrom('=this-year', $this->getFirstThisYear(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('=this-year', $this->getLastThisYear(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+
 
             /**
              * Parses a given date (exactly): last-year.
              */
-            $this->getConfigFrom('last-year', $this->getFirstLastYear(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
-            $this->getConfigTo('last-year', $this->getLastLastYear(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigFrom('last-year', $this->getFirstLastYear(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('last-year', $this->getLastLastYear(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
 
             /**
              * Parses a given date (exactly): last-year.
              */
-            $this->getConfigFrom('=last-year', $this->getFirstLastYear(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
-            $this->getConfigTo('=last-year', $this->getLastLastYear(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigFrom('=last-year', $this->getFirstLastYear(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('=last-year', $this->getLastLastYear(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+
 
             /**
              * Parses a given date (exactly).
@@ -240,6 +490,67 @@ final class DateParserTest extends TestCase
     }
 
     /**
+     * Data provider: Parses a given date (exactly - with time).
+     *
+     * @return array<int, array<int, mixed>>
+     * @throws Exception
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function dataProviderDateTimeExactly(): array
+    {
+        return [
+
+            /**
+             * Parses a given date (exactly).
+             */
+            $this->getConfigFrom('2023-07-01', '2023-07-01 00:00:00', __FUNCTION__),
+            $this->getConfigTo('2023-07-01', '2023-07-01 23:59:59', __FUNCTION__),
+
+            /**
+             * Parses a given date (exactly).
+             */
+            $this->getConfigFrom('=2023-07-01', '2023-07-01 00:00:00', __FUNCTION__),
+            $this->getConfigTo('=2023-07-01', '2023-07-01 23:59:59', __FUNCTION__),
+
+            /**
+             * Parses a given date time (exactly).
+             */
+            $this->getConfigFrom('2023-07-01 10', '2023-07-01 10:00:00', __FUNCTION__),
+            $this->getConfigTo('2023-07-01 10', '2023-07-01 10:59:59', __FUNCTION__),
+
+            /**
+             * Parses a given date time (exactly).
+             */
+            $this->getConfigFrom('=2023-07-01 10', '2023-07-01 10:00:00', __FUNCTION__),
+            $this->getConfigTo('=2023-07-01 10', '2023-07-01 10:59:59', __FUNCTION__),
+
+            /**
+             * Parses a given date time (exactly).
+             */
+            $this->getConfigFrom('2023-07-01 10:12', '2023-07-01 10:12:00', __FUNCTION__),
+            $this->getConfigTo('2023-07-01 10:12', '2023-07-01 10:12:59', __FUNCTION__),
+
+            /**
+             * Parses a given date time (exactly).
+             */
+            $this->getConfigFrom('=2023-07-01 10:12', '2023-07-01 10:12:00', __FUNCTION__),
+            $this->getConfigTo('=2023-07-01 10:12', '2023-07-01 10:12:59', __FUNCTION__),
+
+            /**
+             * Parses a given date time (exactly).
+             */
+            $this->getConfigFrom('2023-07-01 10:12:34', '2023-07-01 10:12:34', __FUNCTION__),
+            $this->getConfigTo('2023-07-01 10:12:34', '2023-07-01 10:12:34', __FUNCTION__),
+
+            /**
+             * Parses a given date time (exactly).
+             */
+            $this->getConfigFrom('=2023-07-01 10:12:34', '2023-07-01 10:12:34', __FUNCTION__),
+            $this->getConfigTo('=2023-07-01 10:12:34', '2023-07-01 10:12:34', __FUNCTION__),
+        ];
+    }
+
+    /**
      * Data provider: Parses a given "from" to "∞ (infinity)" date.
      *
      * @return array<int, array<int, mixed>>
@@ -252,49 +563,57 @@ final class DateParserTest extends TestCase
             /**
              * Parses a given "from" (excluding given date) to "∞ (infinity)" date.
              */
-            $this->getConfigFrom('>today', $this->getTomorrow(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigFrom('>today', $this->getTomorrow(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
             $this->getConfigTo('>today', null, __FUNCTION__),
 
             /**
              * Parses a given "from" (excluding given date) to "∞ (infinity)" date.
              */
-            $this->getConfigFrom('>=today', $this->getToday(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigFrom('>=today', $this->getToday(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
             $this->getConfigTo('>=today', null, __FUNCTION__),
 
             /**
              * Parses a given "from" (excluding given date) to "∞ (infinity)" date.
              */
-            $this->getConfigFrom('>+today', $this->getToday(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigFrom('>+today', $this->getToday(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
             $this->getConfigTo('>+today', null, __FUNCTION__),
 
             /**
              * Parses a given "from" (excluding given date) to "∞ (infinity)" date.
              */
-            $this->getConfigFrom('+today', $this->getToday(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigFrom('+today', $this->getToday(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
             $this->getConfigTo('+today', null, __FUNCTION__),
 
             /**
              * Parses a given "from" (excluding given date) to "∞ (infinity)" date.
              */
-            $this->getConfigFrom('>yesterday', $this->getToday(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigFrom('>yesterday', $this->getToday(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
             $this->getConfigTo('>yesterday', null, __FUNCTION__),
 
             /**
              * Parses a given "from" (excluding given date) to "∞ (infinity)" date.
              */
-            $this->getConfigFrom('>=yesterday', $this->getYesterday(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigFrom('>=yesterday', $this->getYesterday(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
             $this->getConfigTo('>=yesterday', null, __FUNCTION__),
 
             /**
              * Parses a given "from" (excluding given date) to "∞ (infinity)" date.
              */
-            $this->getConfigFrom('>+yesterday', $this->getYesterday(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigFrom('>+yesterday', $this->getYesterday(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
             $this->getConfigTo('>+yesterday', null, __FUNCTION__),
 
             /**
              * Parses a given "from" (excluding given date) to "∞ (infinity)" date.
              */
-            $this->getConfigFrom('+yesterday', $this->getYesterday(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigFrom('+yesterday', $this->getYesterday(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
             $this->getConfigTo('+yesterday', null, __FUNCTION__),
 
             /**
@@ -324,6 +643,121 @@ final class DateParserTest extends TestCase
     }
 
     /**
+     * Data provider: Parses a given "from" to "∞ (infinity)" date time.
+     *
+     * @return array<int, array<int, mixed>>
+     * @throws Exception
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function dataProviderDateTimeToInfinity(): array
+    {
+        return [
+
+            /**
+             * Parses a given "from" (excluding given date) to "∞ (infinity)" date.
+             */
+            $this->getConfigFrom('>2023-07-01', '2023-07-02 00:00:00', __FUNCTION__),
+            $this->getConfigTo('>2023-07-01', null, __FUNCTION__),
+
+            /**
+             * Parses a given "from" (including given date) to "∞ (infinity)" date.
+             */
+            $this->getConfigFrom('>=2023-07-01', '2023-07-01 00:00:00', __FUNCTION__),
+            $this->getConfigTo('>=2023-07-01', null, __FUNCTION__),
+
+            /**
+             * Parses a given "from" (including given date) to "∞ (infinity)" date.
+             */
+            $this->getConfigFrom('>+2023-07-01', '2023-07-01 00:00:00', __FUNCTION__),
+            $this->getConfigTo('>+2023-07-01', null, __FUNCTION__),
+
+            /**
+             * Parses a given "from" (including given date) to "∞ (infinity)" date.
+             */
+            $this->getConfigFrom('+2023-07-01', '2023-07-01 00:00:00', __FUNCTION__),
+            $this->getConfigTo('+2023-07-01', null, __FUNCTION__),
+
+
+
+            /**
+             * Parses a given "from" (excluding given date) to "∞ (infinity)" date time.
+             */
+            $this->getConfigFrom('>2023-07-01 10', '2023-07-01 11:00:00', __FUNCTION__),
+            $this->getConfigTo('>2023-07-01 10', null, __FUNCTION__),
+
+            /**
+             * Parses a given "from" (including given date) to "∞ (infinity)" date time.
+             */
+            $this->getConfigFrom('>=2023-07-01 10', '2023-07-01 10:00:00', __FUNCTION__),
+            $this->getConfigTo('>=2023-07-01 10', null, __FUNCTION__),
+
+            /**
+             * Parses a given "from" (including given date) to "∞ (infinity)" date time.
+             */
+            $this->getConfigFrom('>+2023-07-01 10', '2023-07-01 10:00:00', __FUNCTION__),
+            $this->getConfigTo('>+2023-07-01 10', null, __FUNCTION__),
+
+            /**
+             * Parses a given "from" (including given date) to "∞ (infinity)" date time.
+             */
+            $this->getConfigFrom('+2023-07-01 10', '2023-07-01 10:00:00', __FUNCTION__),
+            $this->getConfigTo('+2023-07-01 10', null, __FUNCTION__),
+
+
+
+            /**
+             * Parses a given "from" (excluding given date) to "∞ (infinity)" date time.
+             */
+            $this->getConfigFrom('>2023-07-01 10:12', '2023-07-01 10:13:00', __FUNCTION__),
+            $this->getConfigTo('>2023-07-01 10:12', null, __FUNCTION__),
+
+            /**
+             * Parses a given "from" (including given date) to "∞ (infinity)" date time.
+             */
+            $this->getConfigFrom('>=2023-07-01 10:12', '2023-07-01 10:12:00', __FUNCTION__),
+            $this->getConfigTo('>=2023-07-01 10:12', null, __FUNCTION__),
+
+            /**
+             * Parses a given "from" (including given date) to "∞ (infinity)" date time.
+             */
+            $this->getConfigFrom('>+2023-07-01 10:12', '2023-07-01 10:12:00', __FUNCTION__),
+            $this->getConfigTo('>+2023-07-01 10:12', null, __FUNCTION__),
+
+            /**
+             * Parses a given "from" (including given date) to "∞ (infinity)" date time.
+             */
+            $this->getConfigFrom('+2023-07-01 10:12', '2023-07-01 10:12:00', __FUNCTION__),
+            $this->getConfigTo('+2023-07-01 10:12', null, __FUNCTION__),
+
+
+
+            /**
+             * Parses a given "from" (excluding given date) to "∞ (infinity)" date time.
+             */
+            $this->getConfigFrom('>2023-07-01 10:12:34', '2023-07-01 10:12:35', __FUNCTION__),
+            $this->getConfigTo('>2023-07-01 10:12:34', null, __FUNCTION__),
+
+            /**
+             * Parses a given "from" (including given date) to "∞ (infinity)" date time.
+             */
+            $this->getConfigFrom('>=2023-07-01 10:12:34', '2023-07-01 10:12:34', __FUNCTION__),
+            $this->getConfigTo('>=2023-07-01 10:12:34', null, __FUNCTION__),
+
+            /**
+             * Parses a given "from" (including given date) to "∞ (infinity)" date time.
+             */
+            $this->getConfigFrom('>+2023-07-01 10:12:34', '2023-07-01 10:12:34', __FUNCTION__),
+            $this->getConfigTo('>+2023-07-01 10:12:34', null, __FUNCTION__),
+
+            /**
+             * Parses a given "from" (including given date) to "∞ (infinity)" date time.
+             */
+            $this->getConfigFrom('+2023-07-01 10:12:34', '2023-07-01 10:12:34', __FUNCTION__),
+            $this->getConfigTo('+2023-07-01 10:12:34', null, __FUNCTION__),
+        ];
+    }
+
+    /**
      * Data provider: Parses a "∞ (infinity)" to given "from" date.
      *
      * @return array<int, array<int, mixed>>
@@ -337,49 +771,61 @@ final class DateParserTest extends TestCase
              * Parses a "∞ (infinity)" to given "from" date (excluding given date).
              */
             $this->getConfigFrom('<today', null, __FUNCTION__),
-            $this->getConfigTo('<today', $this->getYesterday(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('<today', $this->getYesterday(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
 
             /**
              * Parses a "∞ (infinity)" to given "from" date (excluding given date).
              */
             $this->getConfigFrom('<=today', null, __FUNCTION__),
-            $this->getConfigTo('<=today', $this->getToday(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('<=today', $this->getToday(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
 
             /**
              * Parses a "∞ (infinity)" to given "from" date (excluding given date).
              */
             $this->getConfigFrom('<+today', null, __FUNCTION__),
-            $this->getConfigTo('<+today', $this->getToday(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('<+today', $this->getToday(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
 
             /**
              * Parses a "∞ (infinity)" to given "from" date (excluding given date).
              */
             $this->getConfigFrom('-today', null, __FUNCTION__),
-            $this->getConfigTo('-today', $this->getToday(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('-today', $this->getToday(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+
 
             /**
              * Parses a "∞ (infinity)" to given "from" date (excluding given date).
              */
             $this->getConfigFrom('<yesterday', null, __FUNCTION__),
-            $this->getConfigTo('<yesterday', $this->getBeforeYesterday(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('<yesterday', $this->getBeforeYesterday(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
 
             /**
              * Parses a "∞ (infinity)" to given "from" date (excluding given date).
              */
             $this->getConfigFrom('<=yesterday', null, __FUNCTION__),
-            $this->getConfigTo('<=yesterday', $this->getYesterday(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('<=yesterday', $this->getYesterday(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
 
             /**
              * Parses a "∞ (infinity)" to given "from" date (excluding given date).
              */
             $this->getConfigFrom('<+yesterday', null, __FUNCTION__),
-            $this->getConfigTo('<+yesterday', $this->getYesterday(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('<+yesterday', $this->getYesterday(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
 
             /**
              * Parses a "∞ (infinity)" to given "from" date (excluding given date).
              */
             $this->getConfigFrom('-yesterday', null, __FUNCTION__),
-            $this->getConfigTo('-yesterday', $this->getYesterday(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('-yesterday', $this->getYesterday(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+
 
             /**
              * Parses a "∞ (infinity)" to given "from" date (excluding given date).
@@ -408,6 +854,68 @@ final class DateParserTest extends TestCase
     }
 
     /**
+     * Data provider: Parses a "∞ (infinity)" to given "from" date time.
+     *
+     * @return array<int, array<int, mixed>>
+     * @throws Exception
+     */
+    public function dataProviderInfinityToDateTime(): array
+    {
+        return [
+
+            /**
+             * Parses a "∞ (infinity)" to given "from" date (excluding given date).
+             */
+            $this->getConfigFrom('<2023-07-01', null, __FUNCTION__),
+            $this->getConfigTo('<2023-07-01', '2023-06-30 23:59:59', __FUNCTION__),
+
+            /**
+             * Parses a "∞ (infinity)" to given "from" date (excluding given date).
+             */
+            $this->getConfigFrom('<=2023-07-01', null, __FUNCTION__),
+            $this->getConfigTo('<=2023-07-01', '2023-07-01 23:59:59', __FUNCTION__),
+
+            /**
+             * Parses a "∞ (infinity)" to given "from" date (including given date).
+             */
+            $this->getConfigFrom('<+2023-07-01', null, __FUNCTION__),
+            $this->getConfigTo('<+2023-07-01', '2023-07-01 23:59:59', __FUNCTION__),
+
+            /**
+             * Parses a "∞ (infinity)" to given "from" date (including given date).
+             */
+            $this->getConfigFrom('-2023-07-01', null, __FUNCTION__),
+            $this->getConfigTo('-2023-07-01', '2023-07-01 23:59:59', __FUNCTION__),
+
+
+
+            /**
+             * Parses a "∞ (infinity)" to given "from" date (excluding given date time).
+             */
+            $this->getConfigFrom('<2023-07-01 10', null, __FUNCTION__),
+            $this->getConfigTo('<2023-07-01 10', '2023-07-01 09:59:59', __FUNCTION__),
+
+            /**
+             * Parses a "∞ (infinity)" to given "from" date (excluding given date time).
+             */
+            $this->getConfigFrom('<=2023-07-01 10', null, __FUNCTION__),
+            $this->getConfigTo('<=2023-07-01 10', '2023-07-01 10:59:59', __FUNCTION__),
+
+            /**
+             * Parses a "∞ (infinity)" to given "from" date (including given date time).
+             */
+            $this->getConfigFrom('<+2023-07-01 10', null, __FUNCTION__),
+            $this->getConfigTo('<+2023-07-01 10', '2023-07-01 10:59:59', __FUNCTION__),
+
+            /**
+             * Parses a "∞ (infinity)" to given "from" date (including given date time).
+             */
+            $this->getConfigFrom('-2023-07-01 10', null, __FUNCTION__),
+            $this->getConfigTo('-2023-07-01 10', '2023-07-01 10:59:59', __FUNCTION__),
+        ];
+    }
+
+    /**
      * Data provider: Parses a given "from" to "to" date.
      *
      * @return array<int, array<int, mixed>>
@@ -426,37 +934,205 @@ final class DateParserTest extends TestCase
              * Parses a given "from" to "to" date.
              */
             $this->getConfigFrom('2023-07-01|tomorrow', '2023-07-01 00:00:00', __FUNCTION__),
-            $this->getConfigTo('2023-07-01|tomorrow', $this->getTomorrow(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, DateParser::SECOND_LAST)->format(DateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('2023-07-01|tomorrow', $this->getTomorrow(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, DateParser::SECOND_LAST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
 
             /**
              * Parses a given "from" to "to" date.
              */
             $this->getConfigFrom('2023-07-01|today', '2023-07-01 00:00:00', __FUNCTION__),
-            $this->getConfigTo('2023-07-01|today', $this->getToday(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('2023-07-01|today', $this->getToday(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
 
             /**
              * Parses a given "from" to "to" date.
              */
             $this->getConfigFrom('2023-07-01|yesterday', '2023-07-01 00:00:00', __FUNCTION__),
-            $this->getConfigTo('2023-07-01|yesterday', $this->getYesterday(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('2023-07-01|yesterday', $this->getYesterday(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
 
             /**
              * Parses a given "from" to "to" date.
              */
-            $this->getConfigFrom('yesterday|today', $this->getYesterday(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
-            $this->getConfigTo('yesterday|today', $this->getToday(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigFrom('yesterday|today', $this->getYesterday(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('yesterday|today', $this->getToday(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
 
             /**
              * Parses a given "from" to "to" date.
              */
-            $this->getConfigFrom('yesterday|this-month', $this->getYesterday(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
-            $this->getConfigTo('yesterday|this-month', $this->getLastThisMonth(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigFrom('yesterday|this-month', $this->getYesterday(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('yesterday|this-month', $this->getLastThisMonth(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
 
             /**
              * Parses a given "from" to "to" date.
              */
-            $this->getConfigFrom('this-month|today', $this->getFirstThisMonth(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
-            $this->getConfigTo('this-month|today', $this->getToday(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigFrom('this-month|today', $this->getFirstThisMonth(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('this-month|today', $this->getToday(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+        ];
+    }
+
+    /**
+     * Data provider: Parses a given "from" to "to" date time.
+     *
+     * @return array<int, array<int, mixed>>
+     * @throws Exception
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function dataProviderDateTimeFromToTo(): array
+    {
+        return [
+
+            /**
+             * Parses a given "from" to "to" date.
+             */
+            $this->getConfigFrom('2023-07-01|2023-07-03', '2023-07-01 00:00:00', __FUNCTION__),
+            $this->getConfigTo('2023-07-01|2023-07-03', '2023-07-03 23:59:59', __FUNCTION__),
+
+            /**
+             * Parses a given "from" to "to" date time.
+             */
+            $this->getConfigFrom('2023-07-01 10|2023-07-03', '2023-07-01 10:00:00', __FUNCTION__),
+            $this->getConfigTo('2023-07-01 10|2023-07-03', '2023-07-03 23:59:59', __FUNCTION__),
+
+            /**
+             * Parses a given "from" to "to" date time.
+             */
+            $this->getConfigFrom('2023-07-01 10:12|2023-07-03', '2023-07-01 10:12:00', __FUNCTION__),
+            $this->getConfigTo('2023-07-01 10:12|2023-07-03', '2023-07-03 23:59:59', __FUNCTION__),
+
+            /**
+             * Parses a given "from" to "to" date time.
+             */
+            $this->getConfigFrom('2023-07-01 10:12:34|2023-07-03', '2023-07-01 10:12:34', __FUNCTION__),
+            $this->getConfigTo('2023-07-01 10:12:34|2023-07-03', '2023-07-03 23:59:59', __FUNCTION__),
+
+
+
+            /**
+             * Parses a given "from" to "to" date.
+             */
+            $this->getConfigFrom('2023-07-01|2023-07-03', '2023-07-01 00:00:00', __FUNCTION__),
+            $this->getConfigTo('2023-07-01|2023-07-03', '2023-07-03 23:59:59', __FUNCTION__),
+
+            /**
+             * Parses a given "from" to "to" date time.
+             */
+            $this->getConfigFrom('2023-07-01|2023-07-03 10', '2023-07-01 00:00:00', __FUNCTION__),
+            $this->getConfigTo('2023-07-01|2023-07-03 10', '2023-07-03 10:59:59', __FUNCTION__),
+
+            /**
+             * Parses a given "from" to "to" date time.
+             */
+            $this->getConfigFrom('2023-07-01|2023-07-03 10:12', '2023-07-01 00:00:00', __FUNCTION__),
+            $this->getConfigTo('2023-07-01|2023-07-03 10:12', '2023-07-03 10:12:59', __FUNCTION__),
+
+            /**
+             * Parses a given "from" to "to" date time.
+             */
+            $this->getConfigFrom('2023-07-01|2023-07-03 10:12:34', '2023-07-01 00:00:00', __FUNCTION__),
+            $this->getConfigTo('2023-07-01|2023-07-03 10:12:34', '2023-07-03 10:12:34', __FUNCTION__),
+
+
+
+            /**
+             * Parses a given "from" to "to" date.
+             */
+            $this->getConfigFrom('2023-07-01|2023-07-03', '2023-07-01 00:00:00', __FUNCTION__),
+            $this->getConfigTo('2023-07-01|2023-07-03', '2023-07-03 23:59:59', __FUNCTION__),
+
+            /**
+             * Parses a given "from" to "to" date time.
+             */
+            $this->getConfigFrom('2023-07-01 10|2023-07-03 11', '2023-07-01 10:00:00', __FUNCTION__),
+            $this->getConfigTo('2023-07-01 10|2023-07-03 11', '2023-07-03 11:59:59', __FUNCTION__),
+
+            /**
+             * Parses a given "from" to "to" date time.
+             */
+            $this->getConfigFrom('2023-07-01 10:12|2023-07-03 11:13', '2023-07-01 10:12:00', __FUNCTION__),
+            $this->getConfigTo('2023-07-01 10:12|2023-07-03 11:13', '2023-07-03 11:13:59', __FUNCTION__),
+
+            /**
+             * Parses a given "from" to "to" date time.
+             */
+            $this->getConfigFrom('2023-07-01 10:12:34|2023-07-03 11:13:35', '2023-07-01 10:12:34', __FUNCTION__),
+            $this->getConfigTo('2023-07-01 10:12:34|2023-07-03 11:13:35', '2023-07-03 11:13:35', __FUNCTION__),
+
+
+
+            /**
+             * Parses a given "from" to "to" date.
+             */
+            $this->getConfigFrom('2023-07-01|tomorrow', '2023-07-01 00:00:00', __FUNCTION__),
+            $this->getConfigTo('2023-07-01|tomorrow', $this->getTomorrow(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+            /**
+             * Parses a given "from" to "to" date time.
+             */
+            $this->getConfigFrom('2023-07-01 10|tomorrow', '2023-07-01 10:00:00', __FUNCTION__),
+            $this->getConfigTo('2023-07-01 10|tomorrow', $this->getTomorrow(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+            /**
+             * Parses a given "from" to "to" date time.
+             */
+            $this->getConfigFrom('2023-07-01 10:12|tomorrow', '2023-07-01 10:12:00', __FUNCTION__),
+            $this->getConfigTo('2023-07-01 10:12|tomorrow', $this->getTomorrow(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+            /**
+             * Parses a given "from" to "to" date time.
+             */
+            $this->getConfigFrom('2023-07-01 10:12:34|tomorrow', '2023-07-01 10:12:34', __FUNCTION__),
+            $this->getConfigTo('2023-07-01 10:12:34|tomorrow', $this->getTomorrow(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+
+
+            /**
+             * Parses a given "from" to "to" date.
+             */
+            $this->getConfigFrom('2023-07-01|today', '2023-07-01 00:00:00', __FUNCTION__),
+            $this->getConfigTo('2023-07-01|today', $this->getToday(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+            /**
+             * Parses a given "from" to "to" date.
+             */
+            $this->getConfigFrom('2023-07-01|yesterday', '2023-07-01 00:00:00', __FUNCTION__),
+            $this->getConfigTo('2023-07-01|yesterday', $this->getYesterday(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+            /**
+             * Parses a given "from" to "to" date.
+             */
+            $this->getConfigFrom('yesterday|today', $this->getYesterday(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('yesterday|today', $this->getToday(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+            /**
+             * Parses a given "from" to "to" date.
+             */
+            $this->getConfigFrom('yesterday|this-month', $this->getYesterday(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('yesterday|this-month', $this->getLastThisMonth(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+
+            /**
+             * Parses a given "from" to "to" date.
+             */
+            $this->getConfigFrom('this-month|today', $this->getFirstThisMonth(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
+            $this->getConfigTo('this-month|today', $this->getToday(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)
+                ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__),
         ];
     }
 
@@ -522,29 +1198,37 @@ final class DateParserTest extends TestCase
         /**
          * Parses a given date (exactly): tomorrow (UTC -> UTC).
          */
-        $data[] = $this->getConfigFrom('tomorrow', $this->getTomorrow(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__);
-        $data[] = $this->getConfigTo('tomorrow', $this->getTomorrow(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__);
+        $data[] = $this->getConfigFrom('tomorrow', $this->getTomorrow(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST)
+            ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__);
+        $data[] = $this->getConfigTo('tomorrow', $this->getTomorrow(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST)
+            ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__);
 
         /**
          * Parses a given date (exactly): tomorrow (UTC -> UTC).
          */
         $timezoneFrom = new DateTimeZone(Timezones::UTC);
-        $data[] = $this->getConfigFrom('tomorrow::UTC', $this->getTomorrow(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST, $timezoneFrom)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__);
-        $data[] = $this->getConfigTo('tomorrow::UTC', $this->getTomorrow(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST, $timezoneFrom)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__);
+        $data[] = $this->getConfigFrom('tomorrow::UTC', $this->getTomorrow(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST, $timezoneFrom)
+            ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__);
+        $data[] = $this->getConfigTo('tomorrow::UTC', $this->getTomorrow(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST, $timezoneFrom)
+            ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__);
 
         /**
          * Parses a given date (exactly): tomorrow (Europe/Berlin -> UTC).
          */
         $timezoneFrom = new DateTimeZone(Timezones::EUROPE_BERLIN);
-        $data[] = $this->getConfigFrom('tomorrow::Europe/Berlin', $this->getTomorrow(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST, $timezoneFrom)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__);
-        $data[] = $this->getConfigTo('tomorrow::Europe/Berlin', $this->getTomorrow(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST, $timezoneFrom)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__);
+        $data[] = $this->getConfigFrom('tomorrow::Europe/Berlin', $this->getTomorrow(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST, $timezoneFrom)
+            ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__);
+        $data[] = $this->getConfigTo('tomorrow::Europe/Berlin', $this->getTomorrow(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST, $timezoneFrom)
+            ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__);
 
         /**
          * Parses a given date (exactly): tomorrow (America/New_York -> UTC).
          */
         $timezoneFrom = new DateTimeZone(Timezones::AMERICA_NEW_YORK);
-        $data[] = $this->getConfigFrom('tomorrow::America/New_York', $this->getTomorrow(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST, $timezoneFrom)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__);
-        $data[] = $this->getConfigTo('tomorrow::America/New_York', $this->getTomorrow(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST, $timezoneFrom)->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__);
+        $data[] = $this->getConfigFrom('tomorrow::America/New_York', $this->getTomorrow(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST, $timezoneFrom)
+            ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__);
+        $data[] = $this->getConfigTo('tomorrow::America/New_York', $this->getTomorrow(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST, $timezoneFrom)
+            ->format(BaseDateParser::FORMAT_DEFAULT), __FUNCTION__);
 
         /**
          * Parses a given date (exactly): tomorrow (Europe/Berlin -> Europe/Berlin).
@@ -552,8 +1236,10 @@ final class DateParserTest extends TestCase
         $given = 'tomorrow';
         $timezoneFrom = new DateTimeZone(Timezones::EUROPE_BERLIN);
         $timezoneTo = new DateTimeZone(Timezones::EUROPE_BERLIN);
-        $expectedFrom = $this->getTomorrow(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST, $timezoneFrom, $timezoneTo)->format(BaseDateParser::FORMAT_DEFAULT);
-        $expectedTo = $this->getTomorrow(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST, $timezoneFrom, $timezoneTo)->format(BaseDateParser::FORMAT_DEFAULT);
+        $expectedFrom = $this->getTomorrow(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST, $timezoneFrom, $timezoneTo)
+            ->format(BaseDateParser::FORMAT_DEFAULT);
+        $expectedTo = $this->getTomorrow(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST, $timezoneFrom, $timezoneTo)
+            ->format(BaseDateParser::FORMAT_DEFAULT);
         $data[] = $this->getConfigFromTimezone($given, $expectedFrom, $timezoneFrom, $timezoneTo, __FUNCTION__);
         $data[] = $this->getConfigToTimezone($given, $expectedTo, $timezoneFrom, $timezoneTo, __FUNCTION__);
 
@@ -563,8 +1249,10 @@ final class DateParserTest extends TestCase
         $given = 'tomorrow';
         $timezoneFrom = new DateTimeZone(Timezones::EUROPE_BERLIN);
         $timezoneTo = new DateTimeZone(Timezones::AMERICA_NEW_YORK);
-        $expectedFrom = $this->getTomorrow(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST, $timezoneFrom, $timezoneTo)->format(BaseDateParser::FORMAT_DEFAULT);
-        $expectedTo = $this->getTomorrow(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST, $timezoneFrom, $timezoneTo)->format(BaseDateParser::FORMAT_DEFAULT);
+        $expectedFrom = $this->getTomorrow(BaseDateParser::HOUR_FIRST, BaseDateParser::MINUTE_FIRST, BaseDateParser::SECOND_FIRST, $timezoneFrom, $timezoneTo)
+            ->format(BaseDateParser::FORMAT_DEFAULT);
+        $expectedTo = $this->getTomorrow(BaseDateParser::HOUR_LAST, BaseDateParser::MINUTE_LAST, BaseDateParser::SECOND_LAST, $timezoneFrom, $timezoneTo)
+            ->format(BaseDateParser::FORMAT_DEFAULT);
         $data[] = $this->getConfigFromTimezone($given, $expectedFrom, $timezoneFrom, $timezoneTo, __FUNCTION__);
         $data[] = $this->getConfigToTimezone($given, $expectedTo, $timezoneFrom, $timezoneTo, __FUNCTION__);
 
@@ -706,6 +1394,36 @@ final class DateParserTest extends TestCase
             is_null($expected) ? null : sprintf('%s::%s', $expected, $timezoneTo->getName()),
             $method
         );
+    }
+
+    /**
+     * Returns the current second.
+     *
+     * @return int
+     */
+    private function getThisSecond(): int
+    {
+        return (int) date('s');
+    }
+
+    /**
+     * Returns the current minute.
+     *
+     * @return int
+     */
+    private function getThisMinute(): int
+    {
+        return (int) date('i');
+    }
+
+    /**
+     * Returns the current hour.
+     *
+     * @return int
+     */
+    private function getThisHour(): int
+    {
+        return (int) date('H');
     }
 
     /**
