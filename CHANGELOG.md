@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Releases
 
+### [0.1.7] - 2023-07-17
+
+* Add hour, minute and second parser
+* Add this, next, last parser for hour, minute and second
+
 ### [0.1.6] - 2023-07-16
 
 * Add timezone support
