@@ -148,15 +148,15 @@ $dateParser = (new DateParser('<2023-07-01', 'America/New_York'))->formatTo('Y-m
 
 ### Class `DateParser`
 
-| method                               | description                                            | type                      |
-|--------------------------------------|--------------------------------------------------------|---------------------------|
-| <nobr>`->formatFrom($format)`</nobr> | Returns the formatted "from" date.                     | `string`                  |
-| <nobr>`->formatTo($format)`</nobr>   | Returns the formatted "to" date.                       | `string`                  |
-| <nobr>`->getDateRange()`</nobr>      | Returns the range as `DateRange` class.                | `DateRange`               |
-| <nobr>`->getFrom()`</nobr>           | Returns the "from" date as `DateTime` object.          | `DateTime\|null`          |
-| <nobr>`->getTo()`</nobr>             | Returns the "to" date as `DateTime` object.            | `DateTime\|null`          |
-| <nobr>`->getFromImmutable()`</nobr>  | Returns the "from" date as `DateTimeImmutable` object. | `DateTimeImmutable\|null` |
-| <nobr>`->getToImmutable()`</nobr>    | Returns the "to" date as `DateTimeImmutable` object.   | `DateTimeImmutable\|null` |
+| method                                                                        | description                                            | type                      |
+|-------------------------------------------------------------------------------|--------------------------------------------------------|---------------------------|
+| <nobr>`->formatFrom(string $format, DateTimeZone $dateTimeZoneOutput)`</nobr> | Returns the formatted "from" date.                     | `string`                  |
+| <nobr>`->formatTo(string $format, DateTimeZone $dateTimeZoneOutput)`</nobr>   | Returns the formatted "to" date.                       | `string`                  |
+| <nobr>`->getDateRange()`</nobr>                                               | Returns the range as `DateRange` class.                | `DateRange`               |
+| <nobr>`->getFrom(DateTimeZone $dateTimeZoneOutput)`</nobr>                    | Returns the "from" date as `DateTime` object.          | `DateTime\|null`          |
+| <nobr>`->getTo(DateTimeZone $dateTimeZoneOutput)`</nobr>                      | Returns the "to" date as `DateTime` object.            | `DateTime\|null`          |
+| <nobr>`->getFromImmutable(DateTimeZone $dateTimeZoneOutput)`</nobr>           | Returns the "from" date as `DateTimeImmutable` object. | `DateTimeImmutable\|null` |
+| <nobr>`->getToImmutable(DateTimeZone $dateTimeZoneOutput)`</nobr>             | Returns the "to" date as `DateTimeImmutable` object.   | `DateTimeImmutable\|null` |
 
 ## Development
 

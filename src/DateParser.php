@@ -19,6 +19,7 @@ use DateTimeZone;
 use Ixnode\PhpDateParser\Base\BaseDateParser;
 use Ixnode\PhpDateParser\Constants\Timezones;
 use Ixnode\PhpDateParser\Tests\Unit\DateParserTest;
+use Ixnode\PhpException\Case\CaseUnsupportedException;
 
 /**
  * Class DateParser
@@ -46,6 +47,7 @@ class DateParser extends BaseDateParser
      * @param string $format
      * @param DateTimeZone $dateTimeZoneOutput
      * @return string|null
+     * @throws CaseUnsupportedException
      */
     public function formatFrom(string $format, DateTimeZone $dateTimeZoneOutput = new DateTimeZone(Timezones::UTC)): string|null
     {
@@ -58,6 +60,7 @@ class DateParser extends BaseDateParser
      * @param string $format
      * @param DateTimeZone $dateTimeZoneOutput
      * @return string|null
+     * @throws CaseUnsupportedException
      */
     public function formatTo(string $format, DateTimeZone $dateTimeZoneOutput = new DateTimeZone(Timezones::UTC)): string|null
     {
@@ -69,6 +72,7 @@ class DateParser extends BaseDateParser
      *
      * @param DateTimeZone $dateTimeZoneOutput
      * @return DateTime|null
+     * @throws CaseUnsupportedException
      */
     public function getFrom(DateTimeZone $dateTimeZoneOutput = new DateTimeZone(Timezones::UTC)): DateTime|null
     {
@@ -80,6 +84,7 @@ class DateParser extends BaseDateParser
      *
      * @param DateTimeZone $dateTimeZoneOutput
      * @return DateTime|null
+     * @throws CaseUnsupportedException
      */
     public function getTo(DateTimeZone $dateTimeZoneOutput = new DateTimeZone(Timezones::UTC)): DateTime|null
     {
@@ -91,6 +96,7 @@ class DateParser extends BaseDateParser
      *
      * @param DateTimeZone $dateTimeZoneOutput
      * @return DateTimeImmutable|null
+     * @throws CaseUnsupportedException
      */
     public function getFromImmutable(DateTimeZone $dateTimeZoneOutput = new DateTimeZone(Timezones::UTC)): DateTimeImmutable|null
     {
@@ -102,6 +108,7 @@ class DateParser extends BaseDateParser
      *
      * @param DateTimeZone $dateTimeZoneOutput
      * @return DateTimeImmutable|null
+     * @throws CaseUnsupportedException
      */
     public function getToImmutable(DateTimeZone $dateTimeZoneOutput = new DateTimeZone(Timezones::UTC)): DateTimeImmutable|null
     {
