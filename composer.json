@@ -23,7 +23,8 @@
   },
   "require": {
     "php": "^8.2",
-    "ixnode/php-naming-conventions": "^0.1.1"
+    "ixnode/php-naming-conventions": "^0.1.1",
+    "adhocore/cli": "^v1.0.0"
   },
   "require-dev": {
     "phpunit/phpunit": "^9.5",

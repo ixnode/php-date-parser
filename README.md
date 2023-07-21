@@ -5,20 +5,6 @@ DateTime or DateTimeImmutable classes which return the time
 range. Can be used e.g. excellently for command line
 arguments and options to make database queries with.
 
-## Installation
-
-```bash
-composer require ixnode/php-date-parser
-```
-
-```bash
-vendor/bin/php-date-parser -V
-```
-
-```bash
-php-date-parser 0.1.0 (07-07-2023 22:23:01) - Björn Hempel <bjoern@hempel.li>
-```
-
 ## Usage
 
 ```php
@@ -28,11 +14,11 @@ use Ixnode\PhpDateParser\DateParser;
 ### Date parser
 
 ```php
-$dateParser = (new DateParser('<2023-07-01'))->formatFrom('Y-m-d H:i:s');
-// null
+$dateParser = (new DateParser('2023-07-01'))->formatFrom('Y-m-d H:i:s');
+// 2023-07-01 00:00:00
 
-$dateParser = (new DateParser('<2023-07-01'))->formatTo('Y-m-d H:i:s');
-// 2023-06-30 23:59:59
+$dateParser = (new DateParser('2023-07-01'))->formatTo('Y-m-d H:i:s');
+// 2023-07-01 23:59:59
 ```
 
 ### Word parser
@@ -45,14 +31,14 @@ $dateParser = (new DateParser('today'))->formatTo('Y-m-d H:i:s');
 // 2023-07-07 23:59:59
 ```
 
-### Timezones
+### Date parser with timezones
 
 ```php
 $dateParser = (new DateParser('<2023-07-01', 'America/New_York'))->formatFrom('Y-m-d H:i:s', 'Europe/Berlin');
 // null
 
 $dateParser = (new DateParser('<2023-07-01', 'America/New_York'))->formatTo('Y-m-d H:i:s', 'Europe/Berlin');
-// 2023-07-01 09:59:59
+// 2023-07-01 05:59:59
 ```
 
 ## Parsing formats
@@ -157,6 +143,64 @@ $dateParser = (new DateParser('<2023-07-01', 'America/New_York'))->formatTo('Y-m
 | <nobr>`->getTo(DateTimeZone $dateTimeZoneOutput)`</nobr>                      | Returns the "to" date as `DateTime` object.            | `DateTime\|null`          |
 | <nobr>`->getFromImmutable(DateTimeZone $dateTimeZoneOutput)`</nobr>           | Returns the "from" date as `DateTimeImmutable` object. | `DateTimeImmutable\|null` |
 | <nobr>`->getToImmutable(DateTimeZone $dateTimeZoneOutput)`</nobr>             | Returns the "to" date as `DateTimeImmutable` object.   | `DateTimeImmutable\|null` |
+
+## Installation
+
+```bash
+composer require ixnode/php-date-parser
+```
+
+```bash
+vendor/bin/php-date-parser --version
+```
+
+```bash
+0.1.8 (2023-07-18 21:24:05) - Björn Hempel <bjoern@hempel.li>
+```
+
+## Command line
+
+```bash
+bin/console pdt --timezone-input=America/New_York --timezone-output=Europe/Berlin "<2023-07-01"
+```
+
+or within your composer project
+
+```bash
+vendor/bin/php-date-parser pdt --timezone-input=America/New_York --timezone-output=Europe/Berlin "<2023-07-01"
+```
+
+```text
+
+Given date time range: "<2023-07-01" (America/New_York)
+
++------------------------------------------+------------------+
+| Value                                    | Given            |
++------------------------------------------+------------------+
+| Given date time range (America/New_York) | <2023-07-01      |
+| Timezone (input)                         | America/New_York |
+| Timezone (output)                        | Europe/Berlin    |
++------------------------------------------+------------------+
+
+Parsed from given string (input):
+
++------+-------------+---------------------+---------------------+
+| Type | Format      | UTC                 | America/New York    |
++------+-------------+---------------------+---------------------+
+| From | Y-m-d H:i:s | n/a                 | n/a                 |
+| To   | Y-m-d H:i:s | 2023-07-01 03:59:59 | 2023-06-30 23:59:59 |
++------+-------------+---------------------+---------------------+
+
+Parsed output:
+
++------+-------------+---------------------+---------------------+
+| Type | Format      | UTC                 | Europe/Berlin       |
++------+-------------+---------------------+---------------------+
+| From | Y-m-d H:i:s | n/a                 | n/a                 |
+| To   | Y-m-d H:i:s | 2023-07-01 03:59:59 | 2023-07-01 05:59:59 |
++------+-------------+---------------------+---------------------+
+
+```
 
 ## Development
 

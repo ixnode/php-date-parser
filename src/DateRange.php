@@ -43,7 +43,7 @@ class DateRange
     public function __construct(
         DateTime|DateTimeImmutable|null $from,
         DateTime|DateTimeImmutable|null $to,
-        protected DateTimeZone $dateTimeZoneInput = new DateTimeZone('UTC')
+        protected DateTimeZone $dateTimeZoneInput = new DateTimeZone(Timezones::UTC)
     )
     {
         $this->from = match (true) {

@@ -17,6 +17,7 @@ use DateTime;
 use DateTimeImmutable;
 use DateTimeZone;
 use Exception;
+use Ixnode\PhpDateParser\Constants\Timezones;
 use Ixnode\PhpDateParser\DateRange;
 use Ixnode\PhpException\Case\CaseUnsupportedException;
 use Ixnode\PhpException\Parser\ParserException;
@@ -137,12 +138,19 @@ class BaseDateParser
      * @param DateTimeZone $dateTimeZoneInput
      * @throws ParserException
      * @throws TypeInvalidException
+     * @throws CaseUnsupportedException
      */
     public function __construct(string|null $range, protected DateTimeZone $dateTimeZoneInput = new DateTimeZone('UTC'))
     {
         $this->range = !is_null($range) ? trim(strtolower($range)) : null;
 
-        $this->dateRange = $this->parseRange($range);
+        $dateRange = $this->parseRange($range);
+
+        $this->dateRange = $this->getDateRangeInstance(
+            $dateRange->getFrom(),
+            $dateRange->getTo(),
+            $dateTimeZoneInput
+        );
     }
 
     /**
@@ -550,13 +558,18 @@ class BaseDateParser
      *
      * @param DateTime|DateTimeImmutable|null $from
      * @param DateTime|DateTimeImmutable|null $to
+     * @param DateTimeZone $dateTimeZoneInput
      * @return DateRange
      * @throws CaseUnsupportedException
      * @SuppressWarnings(PHPMD.ShortVariable)
      */
-    protected function getDateRangeInstance(DateTime|DateTimeImmutable|null $from, DateTime|DateTimeImmutable|null $to): DateRange
+    protected function getDateRangeInstance(
+        DateTime|DateTimeImmutable|null $from,
+        DateTime|DateTimeImmutable|null $to,
+        DateTimeZone $dateTimeZoneInput = new DateTimeZone(Timezones::UTC)
+    ): DateRange
     {
-        return new DateRange($from, $to, $this->dateTimeZoneInput);
+        return new DateRange($from, $to, $dateTimeZoneInput);
     }
 
     /**
