@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Releases
 
+### [0.1.9] - 2023-07-20
+
+* Add command line interpreter
+* Fix recursive issue with output timezone
+* Update README.md
+
 ### [0.1.8] - 2023-07-18
 
 * Update README.md
