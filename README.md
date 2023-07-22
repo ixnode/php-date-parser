@@ -256,6 +256,10 @@ Parsed output:
 
 ```
 
+## Supported timezones
+
+See: [src/Constants/Timezones.php](https://github.com/ixnode/php-date-parser/blob/main/src/Constants/Timezones.php)
+
 ## Development
 
 ```bash
