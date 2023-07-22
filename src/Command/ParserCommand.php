@@ -90,15 +90,20 @@ class ParserCommand extends Command
 
         $writer->write(PHP_EOL);
         $writer->write(sprintf(
-            'Given date time range: %s (%s)%s',
+            'Given date time range: %s (%s > %s)%s',
             $color->ok(sprintf('"%s"', $dateTimeRange)),
             $timezoneInput->getName(),
+            $timezoneOutput->getName(),
             PHP_EOL
         ));
         $writer->write(PHP_EOL);
         $writer->table([
             [
-                self::KEY_VALUE => sprintf('Given date time range (%s)', $timezoneInput->getName()),
+                self::KEY_VALUE => sprintf(
+                    'Given date time range (%s > %s)',
+                    $timezoneInput->getName(),
+                    $timezoneOutput->getName()
+                ),
                 self::KEY_GIVEN => $dateTimeRange,
             ],
             [

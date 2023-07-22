@@ -16,6 +16,7 @@ namespace Ixnode\PhpDateParser;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeZone;
+use Exception;
 use Ixnode\PhpDateParser\Base\BaseDateParser;
 use Ixnode\PhpDateParser\Constants\Timezones;
 use Ixnode\PhpDateParser\Tests\Unit\DateRangeTest;
@@ -35,6 +36,8 @@ class DateRange
     private ?DateTime $from;
 
     private ?DateTime $to;
+
+    protected DateTimeZone $defaultDateTimeZone;
 
     /**
      * @SuppressWarnings(PHPMD.StaticAccess)
@@ -56,55 +59,93 @@ class DateRange
             $to instanceof DateTime => $this->convertTimezone($to, $dateTimeZoneInput),
             $to instanceof DateTimeImmutable => $this->convertTimezone(DateTime::createFromImmutable($to), $dateTimeZoneInput)
         };
+
+        $this->defaultDateTimeZone = new DateTimeZone(Timezones::UTC);
+    }
+
+    /**
+     * Returns the default date time zone.
+     *
+     * @return DateTimeZone
+     */
+    public function getDefaultDateTimeZone(): DateTimeZone
+    {
+        return $this->defaultDateTimeZone;
+    }
+
+    /**
+     * Sets the default date time zone.
+     *
+     * @param DateTimeZone|string $defaultDateTimeZone
+     * @return self
+     * @throws Exception
+     */
+    public function setDefaultDateTimeZone(DateTimeZone|string $defaultDateTimeZone): self
+    {
+        if (is_string($defaultDateTimeZone)) {
+            $defaultDateTimeZone = new DateTimeZone($defaultDateTimeZone);
+        }
+
+        $this->defaultDateTimeZone = $defaultDateTimeZone;
+
+        return $this;
     }
 
     /**
      * Returns the mutable representation from "from" value.
      *
-     * @param DateTimeZone $dateTimeZoneOutput
+     * @param DateTimeZone|null $dateTimeZone
      * @return DateTime|null
      * @throws CaseUnsupportedException
      */
-    public function getFrom(DateTimeZone $dateTimeZoneOutput = new DateTimeZone(Timezones::UTC)): ?DateTime
+    public function getFrom(DateTimeZone $dateTimeZone = null): ?DateTime
     {
         if (null === $this->from) {
             return null;
         }
 
+        if (is_null($dateTimeZone)) {
+            $dateTimeZone = $this->defaultDateTimeZone;
+        }
+
         $from = clone $this->from;
 
-        return $this->convertTimezone($from, new DateTimeZone(Timezones::UTC), $dateTimeZoneOutput);
+        return $this->convertTimezone($from, new DateTimeZone(Timezones::UTC), $dateTimeZone);
     }
 
     /**
      * Returns the mutable representation from "to" value.
      *
-     * @param DateTimeZone $dateTimeZoneOutput
+     * @param DateTimeZone|null $dateTimeZone
      * @return DateTime|null
      * @throws CaseUnsupportedException
      */
-    public function getTo(DateTimeZone $dateTimeZoneOutput = new DateTimeZone(Timezones::UTC)): ?DateTime
+    public function getTo(DateTimeZone $dateTimeZone = null): ?DateTime
     {
         if (null === $this->to) {
             return null;
         }
 
+        if (is_null($dateTimeZone)) {
+            $dateTimeZone = $this->defaultDateTimeZone;
+        }
+
         $to = clone $this->to;
 
-        return $this->convertTimezone($to, new DateTimeZone(Timezones::UTC), $dateTimeZoneOutput);
+        return $this->convertTimezone($to, new DateTimeZone(Timezones::UTC), $dateTimeZone);
     }
 
     /**
      * Returns the immutable representation from "from" value.
      *
-     * @param DateTimeZone $dateTimeZoneOutput
+     * @param DateTimeZone|null $dateTimeZone
      * @return DateTimeImmutable|null
      * @throws CaseUnsupportedException
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    public function getFromImmutable(DateTimeZone $dateTimeZoneOutput = new DateTimeZone(Timezones::UTC)): ?DateTimeImmutable
+    public function getFromImmutable(DateTimeZone $dateTimeZone = null): ?DateTimeImmutable
     {
-        $from = $this->getFrom($dateTimeZoneOutput);
+        $from = $this->getFrom($dateTimeZone);
 
         if (is_null($from)) {
             return null;
@@ -116,14 +157,14 @@ class DateRange
     /**
      * Returns the immutable representation from "to" value.
      *
-     * @param DateTimeZone $dateTimeZoneOutput
+     * @param DateTimeZone|null $dateTimeZone
      * @return DateTimeImmutable|null
      * @throws CaseUnsupportedException
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    public function getToImmutable(DateTimeZone $dateTimeZoneOutput = new DateTimeZone(Timezones::UTC)): ?DateTimeImmutable
+    public function getToImmutable(DateTimeZone $dateTimeZone = null): ?DateTimeImmutable
     {
-        $to = $this->getTo($dateTimeZoneOutput);
+        $to = $this->getTo($dateTimeZone);
 
         if (is_null($to)) {
             return null;

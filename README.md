@@ -5,40 +5,63 @@ DateTime or DateTimeImmutable classes which return the time
 range. Can be used e.g. excellently for command line
 arguments and options to make database queries with.
 
-## Usage
+## Examples / Usage
 
 ```php
 use Ixnode\PhpDateParser\DateParser;
 ```
 
-### Date parser
+### Date parser (`UTC`)
 
 ```php
-$dateParser = (new DateParser('2023-07-01'))->formatFrom('Y-m-d H:i:s');
+print (new DateParser('2023-07-01'))->formatFrom('Y-m-d H:i:s');
 // 2023-07-01 00:00:00
 
-$dateParser = (new DateParser('2023-07-01'))->formatTo('Y-m-d H:i:s');
+print (new DateParser('2023-07-01'))->formatTo('Y-m-d H:i:s');
 // 2023-07-01 23:59:59
 ```
 
-### Word parser
+### Word parser (`UTC`)
+
+*  Imagine that now is the time: `2023-07-07 12:34:56`
 
 ```php
-$dateParser = (new DateParser('today'))->formatFrom('Y-m-d H:i:s');
+print (new DateParser('today'))->formatFrom('Y-m-d H:i:s');
 // 2023-07-07 00:00:00
 
-$dateParser = (new DateParser('today'))->formatTo('Y-m-d H:i:s');
+print (new DateParser('today'))->formatTo('Y-m-d H:i:s');
 // 2023-07-07 23:59:59
 ```
 
 ### Date parser with timezones
 
+* Input: `America/New_York`
+* Output: `Europe/Berlin`
+
 ```php
-$dateParser = (new DateParser('<2023-07-01', 'America/New_York'))->formatFrom('Y-m-d H:i:s', 'Europe/Berlin');
+/* Parses given date time from timezone America/New_York; Output to timezone Europe/Berlin */
+print (new DateParser('<2023-07-01', 'America/New_York'))->formatFrom('Y-m-d H:i:s', 'Europe/Berlin');
 // null
 
-$dateParser = (new DateParser('<2023-07-01', 'America/New_York'))->formatTo('Y-m-d H:i:s', 'Europe/Berlin');
+/* Parses given date time from timezone America/New_York; Output to timezone Europe/Berlin */
+print (new DateParser('<2023-07-01', 'America/New_York'))->formatTo('Y-m-d H:i:s', 'Europe/Berlin');
 // 2023-07-01 05:59:59
+```
+
+### Working with `DateRange` class
+
+```php
+/* Parses given date time from timezone America/New_York */
+$dateParser = (new DateParser('2023-07-01', 'America/New_York'));
+
+/* Sets default output to timezone Asia/Tokyo */
+$dateRange = $dateParser->getDateRange('Asia/Tokyo');
+
+print $dateRange->getFrom()?->format('Y-m-d H:i:s (e)');
+// 2023-07-01 13:00:00 (Asia/Tokyo)
+
+print $dateRange->getTo()?->format('Y-m-d H:i:s (e)');
+// 2023-07-02 12:59:59 (Asia/Tokyo)
 ```
 
 ## Parsing formats
@@ -68,7 +91,9 @@ $dateParser = (new DateParser('<2023-07-01', 'America/New_York'))->formatTo('Y-m
 
 ### Overview
 
-*  Imagine today would be the: `2023-07-07`
+#### Exact time parser (`=datetime`)
+
+* Imagine that now is the time: `2023-07-07 12:34:56`
 
 | Given format                            | Description                                             | From `('Y-m-d H:i:s')`               | To `('Y-m-d H:i:s')`                 |
 |-----------------------------------------|---------------------------------------------------------|--------------------------------------|--------------------------------------|
@@ -82,7 +107,14 @@ $dateParser = (new DateParser('<2023-07-01', 'America/New_York'))->formatTo('Y-m
 | <nobr>`"=this-month"`</nobr>            | Alias of `"this-month"`                                 | <nobr>`"2023-07-01 00:00:00"`</nobr> | <nobr>`"2023-07-31 23:59:59"`</nobr> |
 | <nobr>`"2023-07-01"`</nobr>             | Exactly the given date.                                 | <nobr>`"2023-07-01 00:00:00"`</nobr> | <nobr>`"2023-07-01 23:59:59"`</nobr> |
 | <nobr>`"=2023-07-01"`</nobr>            | Alias of `"2023-07-01"`                                 | <nobr>`"2023-07-01 00:00:00"`</nobr> | <nobr>`"2023-07-01 23:59:59"`</nobr> |
-| -                                       | -                                                       | -                                    | -                                    |
+
+#### Time is greater than parser (`>from`)
+
+* Imagine that now is the time: `2023-07-07 12:34:56`
+* "To" values are `NULL`
+
+| Given format                            | Description                                             | From `('Y-m-d H:i:s')`               | To `('Y-m-d H:i:s')`                 |
+|-----------------------------------------|---------------------------------------------------------|--------------------------------------|--------------------------------------|
 | <nobr>`">tomorrow"`</nobr>              | Later than tomorrow<sup>1)</sup>                        | <nobr>`"2023-07-09 00:00:00"`</nobr> | <nobr>`NULL`</nobr>                  |
 | <nobr>`">=tomorrow"`</nobr>             | Later than tomorrow<sup>2)</sup>                        | <nobr>`"2023-07-08 00:00:00"`</nobr> | <nobr>`NULL`</nobr>                  |
 | <nobr>`">+tomorrow"`</nobr>             | Alias of `">=tomorrow"`                                 | <nobr>`"2023-07-08 00:00:00"`</nobr> | <nobr>`NULL`</nobr>                  |
@@ -99,7 +131,14 @@ $dateParser = (new DateParser('<2023-07-01', 'America/New_York'))->formatTo('Y-m
 | <nobr>`">=2023-07-01"`</nobr>           | Later than the given date<sup>2)</sup>                  | <nobr>`"2023-07-01 00:00:00"`</nobr> | <nobr>`NULL`</nobr>                  |
 | <nobr>`">+2023-07-01"`</nobr>           | Alias of `">=2023-07-01"`                               | <nobr>`"2023-07-01 00:00:00"`</nobr> | <nobr>`NULL`</nobr>                  |
 | <nobr>`"+2023-07-01"`</nobr>            | Alias of `">=2023-07-01"`                               | <nobr>`"2023-07-01 00:00:00"`</nobr> | <nobr>`NULL`</nobr>                  |
-| -                                       | -                                                       | -                                    | -                                    |
+
+#### Time is less than parser (`<to`)
+
+* Imagine that now is the time: `2023-07-07 12:34:56`
+* "From" values are `NULL`
+
+| Given format                            | Description                                             | From `('Y-m-d H:i:s')`               | To `('Y-m-d H:i:s')`                 |
+|-----------------------------------------|---------------------------------------------------------|--------------------------------------|--------------------------------------|
 | <nobr>`"<tomorrow"`</nobr>              | Before tomorrow<sup>1)</sup>                            | <nobr>`NULL`</nobr>                  | <nobr>`"2023-07-07 23:59:59"`</nobr> |
 | <nobr>`"<=tomorrow"`</nobr>             | Before tomorrow<sup>2)</sup>                            | <nobr>`NULL`</nobr>                  | <nobr>`"2023-07-08 23:59:59"`</nobr> |
 | <nobr>`"<+tomorrow"`</nobr>             | Alias of `"<=tomorrow"`                                 | <nobr>`NULL`</nobr>                  | <nobr>`"2023-07-08 23:59:59"`</nobr> |
@@ -116,7 +155,13 @@ $dateParser = (new DateParser('<2023-07-01', 'America/New_York'))->formatTo('Y-m
 | <nobr>`"<=2023-07-01"`</nobr>           | Before the given date<sup>2)</sup>                      | <nobr>`NULL`</nobr>                  | <nobr>`"2023-07-01 23:59:59"`</nobr> |
 | <nobr>`"<+2023-07-01"`</nobr>           | Alias of `"<=2023-07-01"`                               | <nobr>`NULL`</nobr>                  | <nobr>`"2023-07-01 23:59:59"`</nobr> |
 | <nobr>`"-2023-07-01"`</nobr>            | Alias of `"<=2023-07-01"`                               | <nobr>`NULL`</nobr>                  | <nobr>`"2023-07-01 23:59:59"`</nobr> |
-| -                                       | -                                                       | -                                    | -                                    |
+
+#### Range parser (`from|to`)
+
+* Imagine that now is the time: `2023-07-07 12:34:56`
+
+| Given format                            | Description                                             | From `('Y-m-d H:i:s')`               | To `('Y-m-d H:i:s')`                 |
+|-----------------------------------------|---------------------------------------------------------|--------------------------------------|--------------------------------------|
 | <nobr>`"2023-07-01\|2023-07-03"`</nobr> | Date range from `"2023-07-01"` to `"2023-07-03"`        | <nobr>`"2023-07-01 00:00:00"`</nobr> | <nobr>`"2023-07-03 23:59:59"`</nobr> |
 | <nobr>`"2023-07-01\|tomorrow"`</nobr>   | Date range from `"2023-07-01"` to `"tomorrow"`          | <nobr>`"2023-07-01 00:00:00"`</nobr> | <nobr>`"2023-07-08 23:59:59"`</nobr> |
 | <nobr>`"2023-07-01\|today"`</nobr>      | Date range from `"2023-07-01"` to `"today"`             | <nobr>`"2023-07-01 00:00:00"`</nobr> | <nobr>`"2023-07-07 23:59:59"`</nobr> |
@@ -124,7 +169,11 @@ $dateParser = (new DateParser('<2023-07-01', 'America/New_York'))->formatTo('Y-m
 | <nobr>`"yesterday\|today"`</nobr>       | Date range from `"yesterday"` to `"today"`              | <nobr>`"2023-07-06 00:00:00"`</nobr> | <nobr>`"2023-07-07 23:59:59"`</nobr> |
 | <nobr>`"yesterday\|this-month"`</nobr>  | Date range from `"yesterday"` to last day of this month | <nobr>`"2023-07-06 00:00:00"`</nobr> | <nobr>`"2023-07-31 23:59:59"`</nobr> |
 | <nobr>`"this-month\|today"`</nobr>      | Date range from first day this month to `"today"`       | <nobr>`"2023-07-01 00:00:00"`</nobr> | <nobr>`"2023-07-07 23:59:59"`</nobr> |
-| -                                       | -                                                       | -                                    | -                                    |
+
+#### Infinitive range parser (`NULL`)
+
+| Given format                            | Description                                             | From `('Y-m-d H:i:s')`               | To `('Y-m-d H:i:s')`                 |
+|-----------------------------------------|---------------------------------------------------------|--------------------------------------|--------------------------------------|
 | <nobr>`NULL`</nobr>                     | No range given (infinitive range).                      | <nobr>`NULL`</nobr>                  | <nobr>`NULL`</nobr>                  |
 
 * <sup>1)</sup> - excluding the given one
@@ -155,16 +204,12 @@ vendor/bin/php-date-parser --version
 ```
 
 ```bash
-0.1.8 (2023-07-18 21:24:05) - Björn Hempel <bjoern@hempel.li>
+0.1.10 (2023-07-21 21:39:44) - Björn Hempel <bjoern@hempel.li>
 ```
 
-## Command line
+## Command line tool
 
-```bash
-bin/console pdt --timezone-input=America/New_York --timezone-output=Europe/Berlin "<2023-07-01"
-```
-
-or within your composer project
+Used to quickly check a given date time directly in the command line.
 
 ```bash
 vendor/bin/php-date-parser pdt --timezone-input=America/New_York --timezone-output=Europe/Berlin "<2023-07-01"
@@ -172,15 +217,15 @@ vendor/bin/php-date-parser pdt --timezone-input=America/New_York --timezone-outp
 
 ```text
 
-Given date time range: "<2023-07-01" (America/New_York)
+Given date time range: "<2023-07-01" (America/New_York > Europe/Berlin)
 
-+------------------------------------------+------------------+
-| Value                                    | Given            |
-+------------------------------------------+------------------+
-| Given date time range (America/New_York) | <2023-07-01      |
-| Timezone (input)                         | America/New_York |
-| Timezone (output)                        | Europe/Berlin    |
-+------------------------------------------+------------------+
++----------------------------------------------------------+------------------+
+| Value                                                    | Given            |
++----------------------------------------------------------+------------------+
+| Given date time range (America/New_York > Europe/Berlin) | <2023-07-01      |
+| Timezone (input)                                         | America/New_York |
+| Timezone (output)                                        | Europe/Berlin    |
++----------------------------------------------------------+------------------+
 
 Parsed from given string (input):
 

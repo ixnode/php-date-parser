@@ -139,6 +139,7 @@ class BaseDateParser
      * @throws ParserException
      * @throws TypeInvalidException
      * @throws CaseUnsupportedException
+     * @throws Exception
      */
     public function __construct(string|null $range, protected DateTimeZone $dateTimeZoneInput = new DateTimeZone('UTC'))
     {
@@ -150,7 +151,31 @@ class BaseDateParser
             $dateRange->getFrom(),
             $dateRange->getTo(),
             $dateTimeZoneInput
-        );
+        )->setDefaultDateTimeZone(new DateTimeZone(Timezones::UTC));
+    }
+
+    /**
+     * Returns the default date time zone.
+     *
+     * @return DateTimeZone
+     */
+    public function getDefaultDateTimeZone(): DateTimeZone
+    {
+        return $this->dateRange->getDefaultDateTimeZone();
+    }
+
+    /**
+     * Sets the default date time zone.
+     *
+     * @param DateTimeZone|string $defaultDateTimeZone
+     * @return self
+     * @throws Exception
+     */
+    public function setDefaultDateTimeZone(DateTimeZone|string $defaultDateTimeZone): self
+    {
+        $this->dateRange->setDefaultDateTimeZone($defaultDateTimeZone);
+
+        return $this;
     }
 
     /**
