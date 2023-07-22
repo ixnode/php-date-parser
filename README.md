@@ -1,9 +1,15 @@
 # PHP Date Parser
 
-This library parses various given date and time strings into
-DateTime or DateTimeImmutable classes which return the time
-range. Can be used e.g. excellently for command line
-arguments and options to make database queries with.
+[![Release](https://img.shields.io/github/v/release/ixnode/php-date-parser)](https://github.com/ixnode/php-date-parser/releases)
+[![PHP](https://img.shields.io/badge/PHP-^8.2-777bb3.svg?logo=php&logoColor=white&labelColor=555555&style=flat)](https://www.php.net/supported-versions.php)
+[![PHPStan](https://img.shields.io/badge/PHPStan-Level%20Max-brightgreen.svg?style=flat)](https://phpstan.org/user-guide/rule-levels)
+[![PHPCS](https://img.shields.io/badge/PHPCS-PSR12-brightgreen.svg?style=flat)](https://www.php-fig.org/psr/psr-12/)
+[![LICENSE](https://img.shields.io/github/license/ixnode/php-api-version-bundle)](https://github.com/ixnode/php-api-version-bundle/blob/master/LICENSE)
+
+> This library parses various given date and time strings into
+> DateTime or DateTimeImmutable classes which return the time
+> range. Can be used e.g. excellently for command line
+> arguments and options to make database queries with.
 
 ## Examples / Usage
 
@@ -132,6 +138,9 @@ print $dateRange->getTo()?->format('Y-m-d H:i:s (e)');
 | <nobr>`">+2023-07-01"`</nobr>           | Alias of `">=2023-07-01"`                               | <nobr>`"2023-07-01 00:00:00"`</nobr> | <nobr>`NULL`</nobr>                  |
 | <nobr>`"+2023-07-01"`</nobr>            | Alias of `">=2023-07-01"`                               | <nobr>`"2023-07-01 00:00:00"`</nobr> | <nobr>`NULL`</nobr>                  |
 
+* <sup>1)</sup> - excluding the given one
+* <sup>2)</sup> - including the given one
+* 
 #### Time is less than parser (`<to`)
 
 * Imagine that now is the time: `2023-07-07 12:34:56`
@@ -156,6 +165,9 @@ print $dateRange->getTo()?->format('Y-m-d H:i:s (e)');
 | <nobr>`"<+2023-07-01"`</nobr>           | Alias of `"<=2023-07-01"`                               | <nobr>`NULL`</nobr>                  | <nobr>`"2023-07-01 23:59:59"`</nobr> |
 | <nobr>`"-2023-07-01"`</nobr>            | Alias of `"<=2023-07-01"`                               | <nobr>`NULL`</nobr>                  | <nobr>`"2023-07-01 23:59:59"`</nobr> |
 
+* <sup>1)</sup> - excluding the given one
+* <sup>2)</sup> - including the given one
+
 #### Range parser (`from|to`)
 
 * Imagine that now is the time: `2023-07-07 12:34:56`
@@ -175,9 +187,6 @@ print $dateRange->getTo()?->format('Y-m-d H:i:s (e)');
 | Given format                            | Description                                             | From `('Y-m-d H:i:s')`               | To `('Y-m-d H:i:s')`                 |
 |-----------------------------------------|---------------------------------------------------------|--------------------------------------|--------------------------------------|
 | <nobr>`NULL`</nobr>                     | No range given (infinitive range).                      | <nobr>`NULL`</nobr>                  | <nobr>`NULL`</nobr>                  |
-
-* <sup>1)</sup> - excluding the given one
-* <sup>2)</sup> - including the given one
 
 ## Methods
 
