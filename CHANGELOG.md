@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Releases
 
+### [1.0.2] - 2023-07-22
+
+* Add duration method to DateRange and DateParser class
+* Throw exception if "to" value is lower than "from" value
+
 ### [1.0.1] - 2023-07-22
 
 * Add badges to README.md
