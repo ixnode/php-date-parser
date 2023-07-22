@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Releases
 
+### [1.0.3] - 2023-07-22
+
+* README.md updates
+
 ### [1.0.2] - 2023-07-22
 
 * Add duration method to DateRange and DateParser class
