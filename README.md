@@ -106,18 +106,24 @@ print $dateRange->getTo()?->format('Y-m-d H:i:s (e)');
 
 * Imagine that now is the time: `2023-07-07 12:34:56`
 
-| Given format                            | Description                                             | From `('Y-m-d H:i:s')`               | To `('Y-m-d H:i:s')`                 |
-|-----------------------------------------|---------------------------------------------------------|--------------------------------------|--------------------------------------|
-| <nobr>`"tomorrow"`</nobr>               | Returns the date range from tomorrow.                   | <nobr>`"2023-07-08 00:00:00"`</nobr> | <nobr>`"2023-07-08 23:59:59"`</nobr> |
-| <nobr>`"=tomorrow"`</nobr>              | Alias of `"tomorrow"`.                                  | <nobr>`"2023-07-08 00:00:00"`</nobr> | <nobr>`"2023-07-08 23:59:59"`</nobr> |
-| <nobr>`"today"`</nobr>                  | Returns the date range from today.                      | <nobr>`"2023-07-07 00:00:00"`</nobr> | <nobr>`"2023-07-07 23:59:59"`</nobr> |
-| <nobr>`"=today"`</nobr>                 | Alias of `"today"`.                                     | <nobr>`"2023-07-07 00:00:00"`</nobr> | <nobr>`"2023-07-07 23:59:59"`</nobr> |
-| <nobr>`"yesterday"`</nobr>              | Returns the date range from yesterday.                  | <nobr>`"2023-07-06 00:00:00"`</nobr> | <nobr>`"2023-07-06 23:59:59"`</nobr> |
-| <nobr>`"=yesterday"`</nobr>             | Alias of `"yesterday"`                                  | <nobr>`"2023-07-06 00:00:00"`</nobr> | <nobr>`"2023-07-06 23:59:59"`</nobr> |
-| <nobr>`"this-month"`</nobr>             | Date range from first day to last day this month.       | <nobr>`"2023-07-01 00:00:00"`</nobr> | <nobr>`"2023-07-31 23:59:59"`</nobr> |
-| <nobr>`"=this-month"`</nobr>            | Alias of `"this-month"`                                 | <nobr>`"2023-07-01 00:00:00"`</nobr> | <nobr>`"2023-07-31 23:59:59"`</nobr> |
-| <nobr>`"2023-07-01"`</nobr>             | Exactly the given date.                                 | <nobr>`"2023-07-01 00:00:00"`</nobr> | <nobr>`"2023-07-01 23:59:59"`</nobr> |
-| <nobr>`"=2023-07-01"`</nobr>            | Alias of `"2023-07-01"`                                 | <nobr>`"2023-07-01 00:00:00"`</nobr> | <nobr>`"2023-07-01 23:59:59"`</nobr> |
+| Given format                 | Description                                                                            | From `('Y-m-d H:i:s')`               | To `('Y-m-d H:i:s')`                 |
+|------------------------------|----------------------------------------------------------------------------------------|--------------------------------------|--------------------------------------|
+| <nobr>`"next-hour"`</nobr>   | Returns the date range from the next hour. Alias of `"2023-07-07 13"`.                 | <nobr>`"2023-07-07 13:00:00"`</nobr> | <nobr>`"2023-07-07 13:59:59"`</nobr> |
+| <nobr>`"=next-hour"`</nobr>  | Alias of `"next-hour"`.                                                                | <nobr>`"2023-07-07 13:00:00"`</nobr> | <nobr>`"2023-07-07 13:59:59"`</nobr> |
+| <nobr>`"this-hour"`</nobr>   | Returns the date range from current hour. Alias of `"2023-07-07 12"`.                  | <nobr>`"2023-07-07 12:00:00"`</nobr> | <nobr>`"2023-07-07 12:59:59"`</nobr> |
+| <nobr>`"=this-hour"`</nobr>  | Alias of `"this-hour"`.                                                                | <nobr>`"2023-07-07 12:00:00"`</nobr> | <nobr>`"2023-07-07 12:59:59"`</nobr> |
+| <nobr>`"last-hour"`</nobr>   | Returns the date range from the last hour. Alias of `"2023-07-07 11"`.                 | <nobr>`"2023-07-07 11:00:00"`</nobr> | <nobr>`"2023-07-07 11:59:59"`</nobr> |
+| <nobr>`"=last-hour"`</nobr>  | Alias of `"last-hour"`.                                                                | <nobr>`"2023-07-07 11:00:00"`</nobr> | <nobr>`"2023-07-07 11:59:59"`</nobr> |
+| <nobr>`"tomorrow"`</nobr>    | Returns the date range from tomorrow. Alias of `"2023-07-08"`.                         | <nobr>`"2023-07-08 00:00:00"`</nobr> | <nobr>`"2023-07-08 23:59:59"`</nobr> |
+| <nobr>`"=tomorrow"`</nobr>   | Alias of `"tomorrow"`.                                                                 | <nobr>`"2023-07-08 00:00:00"`</nobr> | <nobr>`"2023-07-08 23:59:59"`</nobr> |
+| <nobr>`"today"`</nobr>       | Returns the date range from today. Alias of `"2023-07-07"`.                            | <nobr>`"2023-07-07 00:00:00"`</nobr> | <nobr>`"2023-07-07 23:59:59"`</nobr> |
+| <nobr>`"=today"`</nobr>      | Alias of `"today"`.                                                                    | <nobr>`"2023-07-07 00:00:00"`</nobr> | <nobr>`"2023-07-07 23:59:59"`</nobr> |
+| <nobr>`"yesterday"`</nobr>   | Returns the date range from yesterday. Alias of `"2023-07-06"`.                        | <nobr>`"2023-07-06 00:00:00"`</nobr> | <nobr>`"2023-07-06 23:59:59"`</nobr> |
+| <nobr>`"=yesterday"`</nobr>  | Alias of `"yesterday"`                                                                 | <nobr>`"2023-07-06 00:00:00"`</nobr> | <nobr>`"2023-07-06 23:59:59"`</nobr> |
+| <nobr>`"this-month"`</nobr>  | Date range from first day to last day this month. Alias of `"2023-07-01\|2023-07-31"`. | <nobr>`"2023-07-01 00:00:00"`</nobr> | <nobr>`"2023-07-31 23:59:59"`</nobr> |
+| <nobr>`"=this-month"`</nobr> | Alias of `"this-month"`                                                                | <nobr>`"2023-07-01 00:00:00"`</nobr> | <nobr>`"2023-07-31 23:59:59"`</nobr> |
+| <nobr>`"2023-07-01"`</nobr>  | Exactly the given date.                                                                | <nobr>`"2023-07-01 00:00:00"`</nobr> | <nobr>`"2023-07-01 23:59:59"`</nobr> |
+| <nobr>`"=2023-07-01"`</nobr> | Alias of `"2023-07-01"`                                                                | <nobr>`"2023-07-01 00:00:00"`</nobr> | <nobr>`"2023-07-01 23:59:59"`</nobr> |
 
 #### Time is greater than parser (`>from`)
 
@@ -243,7 +249,7 @@ Given date time range: "2023-07-01" (America/New_York > Europe/Berlin)
 | Timezone (output)                                        | Europe/Berlin    |
 +----------------------------------------------------------+------------------+
 
-Parsed from given input string (duration: 86399 seconds):
+Parsed from given input string (duration: 86400 seconds):
 
 +------+-------------+---------------------+---------------------+
 | Type | Format      | UTC                 | America/New York    |
@@ -252,7 +258,7 @@ Parsed from given input string (duration: 86399 seconds):
 | To   | Y-m-d H:i:s | 2023-07-02 03:59:59 | 2023-07-01 23:59:59 |
 +------+-------------+---------------------+---------------------+
 
-Parsed output:
+Parsed output (duration: 86400 seconds):
 
 +------+-------------+---------------------+---------------------+
 | Type | Format      | UTC                 | Europe/Berlin       |
