@@ -145,7 +145,7 @@ print $dateRange->getTo()?->format('Y-m-d H:i:s (e)');
 
 * <sup>1)</sup> - excluding the given one
 * <sup>2)</sup> - including the given one
-* 
+
 #### Time is less than parser (`<to`)
 
 * Imagine that now is the time: `2023-07-07 12:34:56`
@@ -197,15 +197,17 @@ print $dateRange->getTo()?->format('Y-m-d H:i:s (e)');
 
 ### Class `DateParser`
 
-| method                                                                        | description                                            | type                      |
-|-------------------------------------------------------------------------------|--------------------------------------------------------|---------------------------|
-| <nobr>`->formatFrom(string $format, DateTimeZone $dateTimeZoneOutput)`</nobr> | Returns the formatted "from" date.                     | `string`                  |
-| <nobr>`->formatTo(string $format, DateTimeZone $dateTimeZoneOutput)`</nobr>   | Returns the formatted "to" date.                       | `string`                  |
-| <nobr>`->getDateRange()`</nobr>                                               | Returns the range as `DateRange` class.                | `DateRange`               |
-| <nobr>`->getFrom(DateTimeZone $dateTimeZoneOutput)`</nobr>                    | Returns the "from" date as `DateTime` object.          | `DateTime\|null`          |
-| <nobr>`->getTo(DateTimeZone $dateTimeZoneOutput)`</nobr>                      | Returns the "to" date as `DateTime` object.            | `DateTime\|null`          |
-| <nobr>`->getFromImmutable(DateTimeZone $dateTimeZoneOutput)`</nobr>           | Returns the "from" date as `DateTimeImmutable` object. | `DateTimeImmutable\|null` |
-| <nobr>`->getToImmutable(DateTimeZone $dateTimeZoneOutput)`</nobr>             | Returns the "to" date as `DateTimeImmutable` object.   | `DateTimeImmutable\|null` |
+| method                                                                                 | description                                                                       | type                      |
+|----------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|---------------------------|
+| <nobr>`->getDateRange(DateTimeZone\|string $dateTimeZone = null)`</nobr>               | Returns the range as `DateRange` class.                                           | `DateRange`               |
+| <nobr>`->formatFrom(string $format, DateTimeZone\|string $dateTimeZone = null)`</nobr> | Returns the formatted "from" date.                                                | `string`                  |
+| <nobr>`->formatTo(string $format, DateTimeZone\|string $dateTimeZone = null)`</nobr>   | Returns the formatted "to" date.                                                  | `string`                  |
+| <nobr>`->getFrom(DateTimeZone\|string $dateTimeZone = null)`</nobr>                    | Returns the "from" date as `DateTime` object.                                     | `DateTime\|null`          |
+| <nobr>`->getTo(DateTimeZone\|string $dateTimeZone = null)`</nobr>                      | Returns the "to" date as `DateTime` object.                                       | `DateTime\|null`          |
+| <nobr>`->getFromImmutable(DateTimeZone\|string $dateTimeZone = null)`</nobr>           | Returns the "from" date as `DateTimeImmutable` object.                            | `DateTimeImmutable\|null` |
+| <nobr>`->getToImmutable(DateTimeZone\|string $dateTimeZone = null)`</nobr>             | Returns the "to" date as `DateTimeImmutable` object.                              | `DateTimeImmutable\|null` |
+| <nobr>`->getDuration()`</nobr>                                                         | Returns the duration from "from" to "to" in seconds.                              | `int\|null`               |
+| <nobr>`->getDurationWithOwn()`</nobr>                                                  | Returns the duration from "from" to "to" in seconds (including the first second). | `int\|null`               |
 
 ## Installation
 
@@ -231,23 +233,23 @@ vendor/bin/php-date-parser pdt --timezone-input=America/New_York --timezone-outp
 
 ```text
 
-Given date time range: "<2023-07-01" (America/New_York > Europe/Berlin)
+Given date time range: "2023-07-01" (America/New_York > Europe/Berlin)
 
 +----------------------------------------------------------+------------------+
 | Value                                                    | Given            |
 +----------------------------------------------------------+------------------+
-| Given date time range (America/New_York > Europe/Berlin) | <2023-07-01      |
+| Given date time range (America/New_York > Europe/Berlin) | 2023-07-01       |
 | Timezone (input)                                         | America/New_York |
 | Timezone (output)                                        | Europe/Berlin    |
 +----------------------------------------------------------+------------------+
 
-Parsed from given string (input):
+Parsed from given input string (duration: 86399 seconds):
 
 +------+-------------+---------------------+---------------------+
 | Type | Format      | UTC                 | America/New York    |
 +------+-------------+---------------------+---------------------+
-| From | Y-m-d H:i:s | n/a                 | n/a                 |
-| To   | Y-m-d H:i:s | 2023-07-01 03:59:59 | 2023-06-30 23:59:59 |
+| From | Y-m-d H:i:s | 2023-07-01 04:00:00 | 2023-07-01 00:00:00 |
+| To   | Y-m-d H:i:s | 2023-07-02 03:59:59 | 2023-07-01 23:59:59 |
 +------+-------------+---------------------+---------------------+
 
 Parsed output:
@@ -255,8 +257,8 @@ Parsed output:
 +------+-------------+---------------------+---------------------+
 | Type | Format      | UTC                 | Europe/Berlin       |
 +------+-------------+---------------------+---------------------+
-| From | Y-m-d H:i:s | n/a                 | n/a                 |
-| To   | Y-m-d H:i:s | 2023-07-01 03:59:59 | 2023-07-01 05:59:59 |
+| From | Y-m-d H:i:s | 2023-07-01 04:00:00 | 2023-07-01 06:00:00 |
+| To   | Y-m-d H:i:s | 2023-07-02 03:59:59 | 2023-07-02 05:59:59 |
 +------+-------------+---------------------+---------------------+
 
 ```

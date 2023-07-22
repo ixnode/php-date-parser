@@ -61,6 +61,17 @@ class DateRange
         };
 
         $this->defaultDateTimeZone = new DateTimeZone(Timezones::UTC);
+
+        $duration = $this->getDuration();
+
+        if (!is_null($duration) && $duration < 0) {
+            throw new CaseUnsupportedException(sprintf(
+                'The duration of the date range cannot be negative: %s. The "to" date (%s) must be later or equal to the "from" date (%s).',
+                $duration,
+                $this->to?->format('Y-m-d H:i:s (e)') ?: 'NULL',
+                $this->from?->format('Y-m-d H:i:s (e)') ?: 'NULL'
+            ));
+        }
     }
 
     /**
@@ -94,11 +105,12 @@ class DateRange
     /**
      * Returns the mutable representation from "from" value.
      *
-     * @param DateTimeZone|null $dateTimeZone
+     * @param DateTimeZone|string|null $dateTimeZone
      * @return DateTime|null
      * @throws CaseUnsupportedException
+     * @throws Exception
      */
-    public function getFrom(DateTimeZone $dateTimeZone = null): ?DateTime
+    public function getFrom(DateTimeZone|string $dateTimeZone = null): ?DateTime
     {
         if (null === $this->from) {
             return null;
@@ -106,6 +118,10 @@ class DateRange
 
         if (is_null($dateTimeZone)) {
             $dateTimeZone = $this->defaultDateTimeZone;
+        }
+
+        if (is_string($dateTimeZone)) {
+            $dateTimeZone = new DateTimeZone($dateTimeZone);
         }
 
         $from = clone $this->from;
@@ -116,11 +132,12 @@ class DateRange
     /**
      * Returns the mutable representation from "to" value.
      *
-     * @param DateTimeZone|null $dateTimeZone
+     * @param DateTimeZone|string|null $dateTimeZone
      * @return DateTime|null
      * @throws CaseUnsupportedException
+     * @throws Exception
      */
-    public function getTo(DateTimeZone $dateTimeZone = null): ?DateTime
+    public function getTo(DateTimeZone|string $dateTimeZone = null): ?DateTime
     {
         if (null === $this->to) {
             return null;
@@ -128,6 +145,10 @@ class DateRange
 
         if (is_null($dateTimeZone)) {
             $dateTimeZone = $this->defaultDateTimeZone;
+        }
+
+        if (is_string($dateTimeZone)) {
+            $dateTimeZone = new DateTimeZone($dateTimeZone);
         }
 
         $to = clone $this->to;
@@ -138,12 +159,12 @@ class DateRange
     /**
      * Returns the immutable representation from "from" value.
      *
-     * @param DateTimeZone|null $dateTimeZone
+     * @param DateTimeZone|string|null $dateTimeZone
      * @return DateTimeImmutable|null
      * @throws CaseUnsupportedException
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    public function getFromImmutable(DateTimeZone $dateTimeZone = null): ?DateTimeImmutable
+    public function getFromImmutable(DateTimeZone|string $dateTimeZone = null): ?DateTimeImmutable
     {
         $from = $this->getFrom($dateTimeZone);
 
@@ -157,12 +178,12 @@ class DateRange
     /**
      * Returns the immutable representation from "to" value.
      *
-     * @param DateTimeZone|null $dateTimeZone
+     * @param DateTimeZone|string|null $dateTimeZone
      * @return DateTimeImmutable|null
      * @throws CaseUnsupportedException
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    public function getToImmutable(DateTimeZone $dateTimeZone = null): ?DateTimeImmutable
+    public function getToImmutable(DateTimeZone|string $dateTimeZone = null): ?DateTimeImmutable
     {
         $to = $this->getTo($dateTimeZone);
 
@@ -171,6 +192,49 @@ class DateRange
         }
 
         return DateTimeImmutable::createFromMutable($to);
+    }
+
+    /**
+     * Returns the duration between "from" and "to" in seconds.
+     *
+     * @return int|null
+     * @throws CaseUnsupportedException
+     */
+    public function getDuration(): int|null
+    {
+        $toDateTime = $this->getTo();
+        $fromDateTime = $this->getFrom();
+
+        if (is_null($fromDateTime) || is_null($toDateTime)) {
+            return null;
+        }
+
+        if ($fromDateTime->getTimezone()->getName() !== $toDateTime->getTimezone()->getName()) {
+            throw new CaseUnsupportedException(sprintf(
+                'Unable to determine duration between different timezones: "%s" and "%s".',
+                $fromDateTime->getTimezone()->getName(),
+                $toDateTime->getTimezone()->getName()
+            ));
+        }
+
+        return $toDateTime->getTimestamp() - $fromDateTime->getTimestamp();
+    }
+
+    /**
+     * Returns the duration between "from" and "to" in seconds.
+     *
+     * @return int|null
+     * @throws CaseUnsupportedException
+     */
+    public function getDurationWithOwn(): int|null
+    {
+        $duration = $this->getDuration();
+
+        if (is_null($duration)) {
+            return null;
+        }
+
+        return $duration + 1;
     }
 
     /**

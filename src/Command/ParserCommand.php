@@ -227,9 +227,20 @@ class ParserCommand extends Command
 
         $dateParser = (new DateParser($dateTimeRange, $timezoneInput));
 
+        $duration = $dateParser->getDurationWithOwn();
+
+        $messageInput = match (true) {
+            is_null($duration) => 'Parsed from given input string (duration: infinite)',
+            default => sprintf('Parsed from given input string (duration: %d seconds)', $duration),
+        };
+        $messageOutput = match (true) {
+            is_null($duration) => 'Parsed output (duration: infinite)',
+            default => sprintf('Parsed output (duration: %d seconds)', $duration),
+        };
+
         $this->printGivenDateTimeRange($dateTimeRange, $timezoneInput, $timezoneOutput);
-        $this->printData($dateParser, $timezoneInput, 'Parsed from given string (input)');
-        $this->printData($dateParser, $timezoneOutput, 'Parsed output');
+        $this->printData($dateParser, $timezoneInput, $messageInput);
+        $this->printData($dateParser, $timezoneOutput, $messageOutput);
         $this->writer->write(PHP_EOL);
 
         return self::SUCCESS;

@@ -16,6 +16,7 @@ namespace Ixnode\PhpDateParser;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeZone;
+use Exception;
 use Ixnode\PhpDateParser\Base\BaseDateParser;
 use Ixnode\PhpDateParser\Constants\Timezones;
 use Ixnode\PhpDateParser\Tests\Unit\DateParserTest;
@@ -36,6 +37,7 @@ class DateParser extends BaseDateParser
      *
      * @param DateTimeZone|string|null $dateTimeZone
      * @return DateRange
+     * @throws Exception
      */
     public function getDateRange(DateTimeZone|string $dateTimeZone = null): DateRange
     {
@@ -50,11 +52,11 @@ class DateParser extends BaseDateParser
      * Returns the "from" date as string.
      *
      * @param string $format
-     * @param DateTimeZone|null $dateTimeZone
+     * @param DateTimeZone|string|null $dateTimeZone
      * @return string|null
      * @throws CaseUnsupportedException
      */
-    public function formatFrom(string $format, DateTimeZone $dateTimeZone = null): string|null
+    public function formatFrom(string $format, DateTimeZone|string $dateTimeZone = null): string|null
     {
         return $this->dateRange->getFrom($dateTimeZone)?->format($format);
     }
@@ -63,11 +65,11 @@ class DateParser extends BaseDateParser
      * Returns the "to" date as string.
      *
      * @param string $format
-     * @param DateTimeZone $dateTimeZone
+     * @param DateTimeZone|string|null $dateTimeZone
      * @return string|null
      * @throws CaseUnsupportedException
      */
-    public function formatTo(string $format, DateTimeZone $dateTimeZone = new DateTimeZone(Timezones::UTC)): string|null
+    public function formatTo(string $format, DateTimeZone|string $dateTimeZone = null): string|null
     {
         return $this->dateRange->getTo($dateTimeZone)?->format($format);
     }
@@ -75,11 +77,11 @@ class DateParser extends BaseDateParser
     /**
      * Returns the "from" date as DateTime object.
      *
-     * @param DateTimeZone $dateTimeZone
+     * @param DateTimeZone|string|null $dateTimeZone
      * @return DateTime|null
      * @throws CaseUnsupportedException
      */
-    public function getFrom(DateTimeZone $dateTimeZone = new DateTimeZone(Timezones::UTC)): DateTime|null
+    public function getFrom(DateTimeZone|string $dateTimeZone = null): DateTime|null
     {
         return $this->dateRange->getFrom($dateTimeZone);
     }
@@ -87,11 +89,11 @@ class DateParser extends BaseDateParser
     /**
      * Returns the "to" date as DateTime object.
      *
-     * @param DateTimeZone $dateTimeZone
+     * @param DateTimeZone|string|null $dateTimeZone
      * @return DateTime|null
      * @throws CaseUnsupportedException
      */
-    public function getTo(DateTimeZone $dateTimeZone = new DateTimeZone(Timezones::UTC)): DateTime|null
+    public function getTo(DateTimeZone|string $dateTimeZone = null): DateTime|null
     {
         return $this->dateRange->getTo($dateTimeZone);
     }
@@ -99,11 +101,11 @@ class DateParser extends BaseDateParser
     /**
      * Returns the "from" date as DateTimeImmutable object.
      *
-     * @param DateTimeZone $dateTimeZone
+     * @param DateTimeZone|string|null $dateTimeZone
      * @return DateTimeImmutable|null
      * @throws CaseUnsupportedException
      */
-    public function getFromImmutable(DateTimeZone $dateTimeZone = new DateTimeZone(Timezones::UTC)): DateTimeImmutable|null
+    public function getFromImmutable(DateTimeZone|string $dateTimeZone = null): DateTimeImmutable|null
     {
         return $this->dateRange->getFromImmutable($dateTimeZone);
     }
@@ -111,12 +113,34 @@ class DateParser extends BaseDateParser
     /**
      * Returns the "to" date as DateTimeImmutable object.
      *
-     * @param DateTimeZone $dateTimeZone
+     * @param DateTimeZone|string|null $dateTimeZone
      * @return DateTimeImmutable|null
      * @throws CaseUnsupportedException
      */
-    public function getToImmutable(DateTimeZone $dateTimeZone = new DateTimeZone(Timezones::UTC)): DateTimeImmutable|null
+    public function getToImmutable(DateTimeZone|string $dateTimeZone = null): DateTimeImmutable|null
     {
         return $this->dateRange->getToImmutable($dateTimeZone);
+    }
+
+    /**
+     * Returns the duration from "from" to "to" in seconds.
+     *
+     * @return int|null
+     * @throws CaseUnsupportedException
+     */
+    public function getDuration(): int|null
+    {
+        return $this->dateRange->getDuration();
+    }
+
+    /**
+     * Returns the duration from "from" to "to" in seconds (with own second).
+     *
+     * @return int|null
+     * @throws CaseUnsupportedException
+     */
+    public function getDurationWithOwn(): int|null
+    {
+        return $this->dateRange->getDurationWithOwn();
     }
 }
